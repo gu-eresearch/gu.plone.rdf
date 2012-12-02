@@ -1,0 +1,19 @@
+<configure
+     xmlns="http://namespaces.zope.org/zope"
+     xmlns:browser="http://namespaces.zope.org/browser"
+     i18n_domain="gu.ordf">
+
+  <!-- Include dependencies' configuration -->
+  <includeDependencies package="." />
+  <include package="gu.z3cform.rdf"/>
+
+  <include file="profiles.zcml"/>
+  <include package=".browser" />
+
+  <utility
+      factory=".component.ORDFUtility" />
+
+  <browser:resourceDirectory
+        directory="static" name="gu.plone.rdf" />
+
+</configure>

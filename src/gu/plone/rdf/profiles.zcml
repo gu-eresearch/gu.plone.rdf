@@ -1,0 +1,30 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <!-- Register the installation GenericSetup extension profile -->
+  <gs:registerProfile
+      name="default"
+      title="ORDF integration"
+      directory="profiles/default"
+      description="ORDF integration profile"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <!-- Register the import step -->
+  <!-- <gs:importStep -->
+  <!--     name="org.ausnc.rdf.catalog" -->
+  <!--     title="AusNC RDF integration catalog setup" -->
+  <!--     description="" -->
+  <!--     handler="org.ausnc.rdf.setuphandlers.import_various" /> -->
+
+  <!-- Register the upgrade step -->
+  <!-- <gs:upgradeStep -->
+  <!--     title="Upgrade rabbitmq settings" -->
+  <!--     description="" -->
+  <!--     source="1000" -->
+  <!--     destination="1001" -->
+  <!--     handler="org.ausnc.rdf.setuphandlers.upgrade1001" -->
+  <!--     profile="org.ausnc.rdf:default" /> -->
+
+</configure>
