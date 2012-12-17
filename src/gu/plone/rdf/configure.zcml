@@ -23,6 +23,12 @@
       provides="gu.repository.content.interfaces.IRepositoryMetadata"
       />
 
+  <adapter
+      factory=".repositorymetadata.RepositoryMetadataAdapter"
+      for="gu.repository.content.interfaces.IRepositoryContainer"
+      provides="gu.repository.content.interfaces.IRepositoryMetadata"
+      />
+
   <!-- FIXME: might be nice to do this for all IAttributeAnnotatable
               but wolud be a bit of an overload -->
   <subscriber
