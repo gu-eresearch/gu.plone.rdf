@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="gu.plone.rdf">
+
+
+    <browser:view
+        name="view_metadata"
+        class=".browser.metadata.ViewMetadataForm"
+        for="zope.annotation.interfaces.IAttributeAnnotatable"
+        permission="zope.Public"
+    />
+
+    <browser:view
+        name="edit_metadata"
+        class=".browser.metadata.EditMetadataForm"
+        for="zope.annotation.interfaces.IAttributeAnnotatable"
+        permission="cmf.ModifyPortalContent"
+    />
+
+
+</configure>

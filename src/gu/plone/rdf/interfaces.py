@@ -2,20 +2,6 @@ from zope import schema
 from zope.interface import Interface
 from gu.plone.rdf import _
 
-class IORDF(Interface):
-    """
-    Ann interface for the global ORDF Utility.
-    """
-
-    def getHandler(self):
-        """ return an ORDF handler """
-
-    def getFresnelGraph(self):
-        """ return a pre compiled Fresnel implementation """
-
-    def resetCaches(self):
-        """ reset all cached values """
-
 
 class IRDFSettings(Interface):
     """

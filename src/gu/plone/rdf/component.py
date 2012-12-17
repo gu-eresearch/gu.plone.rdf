@@ -11,7 +11,8 @@ from zope.schema.interfaces import IVocabularyFactory
 from ordf.handler import init_handler
 from ordf.vocab.fresnel import Fresnel
 #from org.ausnc.rdf.interfaces import IFresnelLensesModified
-from gu.plone.rdf.interfaces import IRDFSettings, IORDF
+from gu.z3cform.rdf.interfaces import IORDF
+from gu.plone.rdf.interfaces import IRDFSettings
 from rdflib import URIRef, RDFS
 
 

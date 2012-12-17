@@ -16,4 +16,23 @@
   <browser:resourceDirectory
         directory="static" name="gu.plone.rdf" />
 
+  <!-- FIXME: should I do this for all content? -->
+  <adapter
+      factory=".repositorymetadata.RepositoryMetadataAdapter"
+      for="gu.repository.content.interfaces.IRepositoryItem"
+      provides="gu.repository.content.interfaces.IRepositoryMetadata"
+      />
+
+  <!-- FIXME: might be nice to do this for all IAttributeAnnotatable
+              but wolud be a bit of an overload -->
+  <subscriber
+      for="gu.repository.content.interfaces.IRepositoryItem
+           zope.lifecycleevent.IObjectAddedEvent"
+      handler=".subscriber.InitialiseGraph" />
+
+  <subscriber
+      for="gu.repository.content.interfaces.IRepositoryContainer
+           zope.lifecycleevent.IObjectAddedEvent"
+      handler=".subscriber.InitialiseGraph" />
+
 </configure>
