@@ -16,4 +16,17 @@
       class=".managegraphs.RDFManageGraphsForm"
       permission="cmf.ManagePortal" />
 
+  <browser:viewlet
+      name="gu.plone.rdf.rdfviewlet"
+      for="plone.uuid.interfaces.IUUIDAware"
+      manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
+      template="rdfviewlet.pt"
+      class=".metadata.ViewMetadataViewlet"
+      permission="zope2.View"
+      />
+<!--      manager="plone.app.layout.viewlets.interfaces.IAboveContent" 
+      e.g. one of the viewlets that's being rendered on edit pages too
+-->
+
+
 </configure>

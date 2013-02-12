@@ -3,6 +3,20 @@ from gu.z3cform.rdf.fresnel.edit import FieldsFromLensMixin
 from gu.repository.content.interfaces import IRepositoryMetadata
 from z3c.form import form
 from z3c.form.interfaces import DISPLAY_MODE
+from plone.app.layout.viewlets import ViewletBase
+from Acquisition import aq_inner
+from zope.interface import alsoProvides
+from z3c.form.interfaces import IFormLayer
+#from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from zope.browserpage import ViewPageTemplateFile
+from plone.z3cform import z2
+
+# starting from 0.6.0 version plone.z3cform has IWrappedForm interface 
+try:
+    from plone.z3cform.interfaces import IWrappedForm 
+    HAS_WRAPPED_FORM = True 
+except ImportError: 
+    HAS_WRAPPED_FORM = False
 
 
 class EditMetadataForm(FieldsFromLensMixin, form.EditForm):
@@ -41,19 +55,19 @@ class ViewMetadataForm(FieldsFromLensMixin, form.Form):
         self.updateFields()
         super(ViewMetadataForm, self).update()
 
-    # def __call__(self):
-    #     self.update()
-    #     return self.render()
 
-    # def render(self):
-    #     '''See interfaces.IForm'''
-    #     # render content template
-    #     import zope.component
-    #     from zope.pagetemplate.interfaces import IPageTemplate
 
-    #     if self.template is None:
-    #         template = zope.component.getMultiAdapter((self, self.request),
-    #             IPageTemplate)
-    #         return template(self)
-    #     return self.template()
 
+
+class ViewMetadataViewlet(ViewletBase):
+
+    index = ViewPageTemplateFile('rdfviewlet.pt')
+    label = 'Metadata'
+
+    def update(self):
+        super(ViewMetadataViewlet, self).update()
+        z2.switch_on(self, request_layer=IFormLayer)
+        self.form = ViewMetadataForm(aq_inner(self.context), self.request)
+        if HAS_WRAPPED_FORM: 
+            alsoProvides(self.form, IWrappedForm)        
+        self.form.update()
