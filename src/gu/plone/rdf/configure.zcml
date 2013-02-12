@@ -39,6 +39,12 @@
            zope.lifecycleevent.IObjectRemovedEvent"
       handler=".subscriber.RemoveGraph" />
 
+    <utility
+        name="gu.plone.rdf.LocalGraphVocabulary"
+        factory=".vocabulary.LocalGraphVocabularyFactory"
+        />
+
+
 <!-- <subscriber -->
 <!--     	for="..interfaces.IObjectInterface  -->
 <!--     			Products.Archetypes.interfaces.IObjectInitializedEvent" -->
