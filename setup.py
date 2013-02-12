@@ -30,6 +30,7 @@ setup(name='gu.plone.rdf',
           'plone.app.registry',
           'gu.z3cform.rdf',
           'ordf',
+          'rdflib-zodb',
       ],
       extras_require={
           'test': ['plone.app.testing', ]
