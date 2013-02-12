@@ -10,6 +10,9 @@ LOG = logging.getLogger(__name__)
 
 
 def RepositoryMetadataAdapter(context):
+    # ... use uuid to generate URIs.
+    # users may give additional URIs / identifiers to be stored as dc:identifier subproperties. (makes them queryable)
+    
     #1. determine subject uri for context
     # FIXME: use property, attribute, context absolute url
     uuid = IUUID(context)
@@ -26,5 +29,3 @@ def RepositoryMetadataAdapter(context):
     LOG.info('retrieved %d triples for %s', len(graph), graph.identifier)
 
     return graph
-
-    

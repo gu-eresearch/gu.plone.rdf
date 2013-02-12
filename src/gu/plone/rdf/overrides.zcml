@@ -5,6 +5,7 @@
     i18n_domain="gu.plone.rdf">
 
 
+    <!-- overrides for views from gu.repository.content -->
     <browser:view
         name="view_metadata"
         class=".browser.metadata.ViewMetadataForm"
@@ -18,6 +19,5 @@
         for="zope.annotation.interfaces.IAttributeAnnotatable"
         permission="cmf.ModifyPortalContent"
     />
-
 
 </configure>

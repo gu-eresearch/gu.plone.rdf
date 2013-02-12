@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <configure
      xmlns="http://namespaces.zope.org/zope"
      xmlns:browser="http://namespaces.zope.org/browser"
@@ -16,29 +17,31 @@
   <browser:resourceDirectory
         directory="static" name="gu.plone.rdf" />
 
-  <!-- FIXME: should I do this for all content? -->
+  <!-- everything that has an UUID can have Metadata attached to it -->
   <adapter
       factory=".repositorymetadata.RepositoryMetadataAdapter"
-      for="gu.repository.content.interfaces.IRepositoryItem"
+      for="plone.uuid.interfaces.IUUIDAware"
       provides="gu.repository.content.interfaces.IRepositoryMetadata"
       />
 
-  <adapter
-      factory=".repositorymetadata.RepositoryMetadataAdapter"
-      for="gu.repository.content.interfaces.IRepositoryContainer"
-      provides="gu.repository.content.interfaces.IRepositoryMetadata"
-      />
-
-  <!-- FIXME: might be nice to do this for all IAttributeAnnotatable
-              but wolud be a bit of an overload -->
   <subscriber
-      for="gu.repository.content.interfaces.IRepositoryItem
+      for="plone.uuid.interfaces.IUUIDAware
            zope.lifecycleevent.IObjectAddedEvent"
       handler=".subscriber.InitialiseGraph" />
 
   <subscriber
-      for="gu.repository.content.interfaces.IRepositoryContainer
-           zope.lifecycleevent.IObjectAddedEvent"
-      handler=".subscriber.InitialiseGraph" />
+      for="plone.uuid.interfaces.IUUIDAware
+           zope.lifecycleevent.IObjectModifiedEvent"
+      handler=".subscriber.ModifyGraph" />
+
+  <subscriber
+      for="plone.uuid.interfaces.IUUIDAware
+           zope.lifecycleevent.IObjectRemovedEvent"
+      handler=".subscriber.RemoveGraph" />
+
+<!-- <subscriber -->
+<!--     	for="..interfaces.IObjectInterface  -->
+<!--     			Products.Archetypes.interfaces.IObjectInitializedEvent" -->
+<!--         handler=".myobject.storeMyObject" /> ... fired when edit succeeded -->
 
 </configure>
