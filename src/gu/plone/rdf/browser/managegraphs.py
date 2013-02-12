@@ -15,30 +15,10 @@ from zope.event import notify
 from rdflib import Graph, URIRef
 from plone.registry.interfaces import IRegistry
 from cStringIO import StringIO
-from gu.plone.rdf import _
+from gu.plone.rdf import _, LOG
 from gu.z3cform.rdf.interfaces import IORDF
-
-LOG = logging.getLogger(__name__)
-
-# FIME: move this somewhere generic e.g. into rdf base package ... a geniric func to determine input file format based on filename and/or mime-type
-import os.path
-def guessRDFFileFormat(format, contentType, filename):
-    """
-    determine file format:
-
-    if format is not known, check contentType and filename
-
-    TODO: take contentType into account
-    """
-    if format.lower() not in ('n3', 'xml'):
-        ext = os.path.splitext(filename)[1].lower()
-        if ext in ('.n3',):
-            return u"n3"
-        elif ext in ('.rdf', '.owl'):
-            return u"xml"
-        return None
-    return format
-
+from gu.z3cform.rdf.utils import guessRDFFileFormat
+from z3c.form.interfaces import NOT_CHANGED
 
 
 class IManageGraphs(form.Schema):  # Interface):
@@ -57,7 +37,7 @@ class IManageGraphs(form.Schema):  # Interface):
         )
 
     newgraph = schema.URI(
-        title=_(u"New Graph"),
+        title=_(u"New Graph URI"),
         description=_(u"Enter a new graph URI here"),
         required=False,
         )
@@ -68,7 +48,7 @@ class IManageGraphs(form.Schema):  # Interface):
         default=False)
 
     format = schema.Choice(
-        title=u'Format',
+        title=_(u'Format'),
         vocabulary=SimpleVocabulary(
             [SimpleVocabulary.createTerm('auto', 'auto', u"Auto"),
              SimpleVocabulary.createTerm('n3', 'n3', u"N3"),
@@ -82,6 +62,7 @@ class IManageGraphs(form.Schema):  # Interface):
         description=_(u"Please upload a file"),
         required=False,
         )
+    
     downloadurl = schema.URI(
         title=_(u"File URL"),
         description=_(u"RDF data location"),
@@ -94,16 +75,12 @@ class IManageGraphs(form.Schema):  # Interface):
     #       query store
 
 
-class RDFManageGraphsForm(form.SchemaForm):
+class ManageGraphsForm(form.SchemaForm):
 
     # TODO: allow for graph creation?
     #       download a graph
     #       execute a query?
     #       move file upload into separate tool... (see also rdf_upload.py)
-
-    grok.context(INavigationRoot)
-    grok.require('cmf.ManagePortal')
-    grok.name('plone_rdf_managegraphs')
 
     ignoreContext = True
     template = ViewPageTemplateFile('managegraphs.pt')
@@ -111,53 +88,6 @@ class RDFManageGraphsForm(form.SchemaForm):
     schema = IManageGraphs
 
     enable_form_tabbing = False
-
-    #fields = field.Fields(IGraphManagement)
-
-    def updateActions(self):
-        super(RDFManageGraphsForm, self).updateActions()
-        #self.actions['clearfresnel'].addClass("context")
-        self.actions['clear'].addClass("standalone")
-        self.actions['upload'].addClass("standalone")
-
-    # @button.buttonAndHandler(u'Clear Fresnel Cache', name="clearfresnel")
-    # def handleClearFresnelCache(self, action):
-    #     notify(FresnelLensesModifiedEvent())
-
-    @button.buttonAndHandler(u'Clear')
-    def handleClear(self, action):
-        # TODO: clear selected list on success.... (refresh from backend?)
-        #       also change from add/remove widget to multi checkbox?
-        data, errors = self.extractData()
-        h = getUtility(IORDF).getHandler()
-        for graphid in data.get('graph', []):
-            g = Graph(identifier=URIRef(graphid))
-            # TODO: that's not going via the queue. should it?
-            h.remove(g)
-            #self.notifyChanges(g)
-            IStatusMessage(self.request).addStatusMessage(
-                _(u"Graph %s deleted." % g), "info")
-        self.request.response.redirect(self.request.getURL())
-
-    def getGraph(self, data):
-        """
-        parse Graph from request
-        """
-        graphuri = self.getGraphURI(data)
-        #g = Graph(store='TmpDiskStore', identifier=graphuri)
-        g = Graph(identifier=graphuri)
-
-        if data['filedata']:
-            # uploaded file ...
-            fmt = guessRDFFileFormat(data['format'],
-                                     data['filedata'].contentType,
-                                     data['filedata'].filename)
-            g.parse(StringIO(data['filedata'].data), format=fmt)
-        elif data['downloadurl']:
-            # TODO: would be nice to check graph for graphuri, but it is
-            #       already a bit late here... needs improvement
-            g.parse(data['downloaduri'])
-        return g
 
     def getGraphURI(self, data):
         """
@@ -171,6 +101,28 @@ class RDFManageGraphsForm(form.SchemaForm):
         #3. check graph namespace?
         #    e.g.: - check for owl:Ontology:about ???
         #          - sorted([(len(x), x) for x in g.subjects()])[0]
+
+    def getGraph(self, data):
+        """
+        parse Graph from request
+        """
+        graphuri = self.getGraphURI(data)
+        # TODO: consider using temporary disk storage to not overload server ... or stop parsing graph by some other means
+        g = Graph(identifier=graphuri)
+
+        if data['filedata'] and data['filedata'] != NOT_CHANGED:
+            # uploaded file ...
+            fmt = guessRDFFileFormat(data['format'],
+                                     data['filedata'].contentType,
+                                     data['filedata'].filename)
+            g.parse(StringIO(data['filedata'].data), format=fmt)
+        elif data['downloadurl']:
+            # TODO: would be nice to check graph for graphuri, but it is
+            #       already a bit late here... needs improvement
+            fmt = guessRDFFileFormat(data['format'], '', '')
+            g.parse(data['downloadurl'], format=fmt)
+        return g
+
 
     @button.buttonAndHandler(u'Upload')
     def handleUpload(self, action):
@@ -207,12 +159,38 @@ class RDFManageGraphsForm(form.SchemaForm):
         if error:
             msg = u"RDF upload failed: %s" % str(error)
             msg_type = 'error'
-            self.request.response.setStatus(status=400, reason=str(msg))
+            self.request.response.setStatus(status=400, reason='Import failed')
         else:
             msg = _(u"RDF upload successful")
             msg_type = 'info'
             self.request.response.redirect(self.request.getURL())
         IStatusMessage(self.request).add(msg, type=msg_type)
+
+        
+    def updateActions(self):
+        super(ManageGraphsForm, self).updateActions()
+        #self.actions['clearfresnel'].addClass("context")
+        self.actions['clear'].addClass("standalone")
+        self.actions['upload'].addClass("standalone")
+
+    @button.buttonAndHandler(u'Clear')
+    def handleClear(self, action):
+        # TODO: clear selected list on success.... (refresh from backend?)
+        #       also change from add/remove widget to multi checkbox?
+        data, errors = self.extractData()
+        h = getUtility(IORDF).getHandler()
+        for graphid in data.get('graph', []):
+            g = Graph(identifier=URIRef(graphid))
+            # TODO: that's not going via the queue. should it?
+            h.remove(g)
+            #self.notifyChanges(g)
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"Graph %s deleted." % g), "info")
+        self.request.response.redirect(self.request.getURL())
+        
+    # @button.buttonAndHandler(u'Clear Fresnel Cache', name="clearfresnel")
+    # def handleClearFresnelCache(self, action):
+    #     notify(FresnelLensesModifiedEvent())
 
     # def notifyChanges(self, graph):
     #     registry = getUtility(IRegistry)
