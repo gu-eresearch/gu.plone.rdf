@@ -5,8 +5,6 @@ from cStringIO import StringIO
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 from zope.interface import implements
-from zope.schema.vocabulary import SimpleVocabulary
-from zope.schema.interfaces import IVocabularyFactory
 from zope.component.hooks import getSite
 from zope.annotation.interfaces import IAnnotations
 
@@ -15,9 +13,7 @@ from ordf.vocab.fresnel import Fresnel
 #from org.ausnc.rdf.interfaces import IFresnelLensesModified
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.plone.rdf.interfaces import IRDFSettings
-from rdflib import URIRef, RDFS, ConjunctiveGraph
-from rdflib import plugin
-
+from rdflib import plugin, URIRef
 
 LOG = logging.getLogger(__name__)
 
@@ -83,7 +79,7 @@ class ORDFUtility(object):
     def getFresnelGraph(self):
         if self.fresnel is None:
             LOG.info("reading fresnel graph form triple store")
-            rdfhandler = self.getHandler()
+            #rdfhandler = self.getHandler()
             registry = getUtility(IRegistry)
             settings = registry.forInterface(IRDFSettings, check=False)
             formatgraphuri = URIRef(settings.fresnel_graph_uri)

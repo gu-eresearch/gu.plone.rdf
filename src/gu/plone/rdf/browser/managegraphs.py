@@ -12,7 +12,8 @@ from zope import schema
 from zope.component import getUtility
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.event import notify
-from rdflib import Graph, URIRef, ConjunctiveGraph
+from rdflib import URIRef
+from ordf.graph import Graph, ConjunctiveGraph
 from plone.registry.interfaces import IRegistry
 from cStringIO import StringIO
 from gu.plone.rdf import _, LOG

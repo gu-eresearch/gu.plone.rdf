@@ -5,7 +5,8 @@ from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.plone.rdf.interfaces import IRDFSettings
 from plone.registry.interfaces import IRegistry
-from rdflib import Graph, URIRef
+from rdflib import URIRef
+from ordf.graph import Graph
 import logging
 
 LOG = logging.getLogger(__name__)

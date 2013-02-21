@@ -3,7 +3,7 @@ from zope.interface import implements
 from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.z3cform.rdf.vocabulary import QuerySimpleVocabulary
-from rdflib import ConjunctiveGraph
+from ordf.graph import ConjunctiveGraph
 
 
 class LocalGraphVocabularyFactory(object):
