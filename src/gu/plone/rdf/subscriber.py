@@ -96,7 +96,7 @@ def RemoveGraph(object, event):
     #       1. remove Graph itself
     #       2. remove all relations pointing from here
     #       3. remove all relations pointing to here (might be hard to do for )
-    graph = IRepositoryMetadata(self.object)
+    graph = IRepositoryMetadata(object)
     # Note: just remove the graph. In theory it can be reconstructed by all the changesets that refer to it.
     handler = getUtility(IORDF).getHandler()
     handler.remove(graph)
