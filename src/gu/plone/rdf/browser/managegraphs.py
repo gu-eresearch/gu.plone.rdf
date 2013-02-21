@@ -151,6 +151,7 @@ class ManageGraphsForm(form.SchemaForm):
                     h.append(g)
                 # We went until here so it should all be fine
                 #self.notifyChanges(g)
+                rdftool.clearCache()
             except Exception, e:
                 error = e
             finally:
@@ -324,6 +325,7 @@ class ManageLocalGraphsForm(form.SchemaForm):
                     cg.remove_context(g)
                 quads = ( (s, p, o, g) for (s, p, o) in g.triples((None, None, None)))
                 cg.addN(quads)
+                rdftool.clearCache()
                 # We went until here so it should all be fine
                 #self.notifyChanges(g)
             except Exception, e:
@@ -353,11 +355,13 @@ class ManageLocalGraphsForm(form.SchemaForm):
         # TODO: clear selected list on success.... (refresh from backend?)
         #       also change from add/remove widget to multi checkbox?
         data, errors = self.extractData()
-        h = getUtility(IORDF).getHandler()
+        rdftool = getUtility(IORDF)
         for graphid in data.get('graph', []):
-            g = Graph(identifier=URIRef(graphid))
-            # TODO: that's not going via the queue. should it?
-            h.remove(g)
+            store = rdftool.getLocalStore()
+            cg = ConjunctiveGraph(store)
+            g = cg.get_context(URIRef(graphid))
+            cg.remove_context(g)
+            rdftool.clearCache()
             #self.notifyChanges(g)
             IStatusMessage(self.request).addStatusMessage(
                 _(u"Graph %s deleted." % g), "info")

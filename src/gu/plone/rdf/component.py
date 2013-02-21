@@ -121,3 +121,6 @@ class ORDFUtility(object):
         # TODO: implement this:
         #       fetch graph with current handler and return it.
         raise NotImplementedError()
+
+    def clearCache(self):
+        self.fresnel = None
