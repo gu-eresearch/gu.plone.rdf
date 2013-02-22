@@ -12,11 +12,11 @@
       />
 
   <!-- Register the import step -->
-  <!-- <gs:importStep -->
-  <!--     name="org.ausnc.rdf.catalog" -->
-  <!--     title="AusNC RDF integration catalog setup" -->
-  <!--     description="" -->
-  <!--     handler="org.ausnc.rdf.setuphandlers.import_various" /> -->
+  <gs:importStep
+      name="gu.plone.rdf.catalog"
+      title="Plone RDF integration catalog setup"
+      description=""
+      handler="gu.plone.rdf.setuphandlers.import_various" />
 
   <!-- Register the upgrade step -->
   <!-- <gs:upgradeStep -->

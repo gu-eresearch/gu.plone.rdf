@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<object name="portal_catalog" meta_type="Plone Catalog Tool">
+    <!-- do not create indices here, do it in setuphandlers.py -->
+    <!-- columns can be defined here, they are not removed when this profile is reinstalled -->
+    <!-- <column value="subjecturi"/> -->
+</object>

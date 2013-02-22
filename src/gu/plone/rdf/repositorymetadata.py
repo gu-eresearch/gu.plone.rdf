@@ -16,16 +16,7 @@ def RepositoryMetadataAdapter(context):
     # ... use uuid to generate URIs.
     # users may give additional URIs / identifiers to be stored as dc:identifier subproperties. (makes them queryable)
     
-    #1. determine subject uri for context
-    # FIXME: use property, attribute, context absolute url
-    uuid = IUUID(context)
-    #url = base_uri + /@@redirect-to-uuid/<uuid>
-    #uri = context.subjecturi
-
-    registry = getUtility(IRegistry)
-    settings = registry.forInterface(IRDFSettings, check=False)
-
-    contenturi = "%s%s" % (settings.base_uri, uuid)
+    contenturi = getContentUri(context)
 
     handler = getUtility(IORDF).getHandler()
     try:
@@ -37,3 +28,16 @@ def RepositoryMetadataAdapter(context):
         LOG.info('retrieved %d triples for %s', len(graph), graph.identifier)
 
     return graph
+
+def getContentUri(context):
+    #1. determine subject uri for context
+    # FIXME: use property, attribute, context absolute url
+    uuid = IUUID(context)
+    #url = base_uri + /@@redirect-to-uuid/<uuid>
+    #uri = context.subjecturi
+
+    registry = getUtility(IRegistry)
+    settings = registry.forInterface(IRDFSettings, check=False)
+
+    contenturi = "%s%s" % (settings.base_uri, uuid)
+    return contenturi

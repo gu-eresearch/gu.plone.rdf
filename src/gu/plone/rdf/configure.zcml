@@ -24,6 +24,11 @@
       provides="gu.repository.content.interfaces.IRepositoryMetadata"
       />
 
+  <adapter
+      factory=".indexer.subjectURIIndexer"
+      name="subjecturi"
+      />
+
   <subscriber
       for="plone.uuid.interfaces.IUUIDAware
            zope.lifecycleevent.IObjectAddedEvent"
