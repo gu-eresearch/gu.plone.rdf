@@ -9,7 +9,7 @@ from zope.component.hooks import getSite
 from zope.annotation.interfaces import IAnnotations
 
 from ordf.handler import init_handler
-from ordf.vocab.fresnel import Fresnel
+from gu.z3cform.rdf.fresnel.fresnel import Fresnel
 #from org.ausnc.rdf.interfaces import IFresnelLensesModified
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.plone.rdf.interfaces import IRDFSettings
@@ -76,7 +76,7 @@ class ORDFUtility(object):
             store = portal_annotations['gu.plone.rdf'] = plugin.get('ZODB', plugin.Store)()
         return store
 
-    def getFresnelGraph(self):
+    def getFresnel(self):
         if self.fresnel is None:
             LOG.info("reading fresnel graph form triple store")
             #rdfhandler = self.getHandler()
