@@ -1,13 +1,12 @@
-from gu.repository.content.interfaces import IRepositoryMetadata
 from plone.uuid.interfaces import IUUID
-from Products.CMFCore.utils import getToolByName
-from zope.component import getUtility
+from zope.component import getUtility, queryUtility
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.plone.rdf.interfaces import IRDFSettings
 from plone.registry.interfaces import IRegistry
-from rdflib import URIRef
 from ordf.graph import Graph
 import logging
+from Acquisition import aq_base
+
 
 LOG = logging.getLogger(__name__)
 
@@ -15,15 +14,14 @@ LOG = logging.getLogger(__name__)
 def RepositoryMetadataAdapter(context):
     # ... use uuid to generate URIs.
     # users may give additional URIs / identifiers to be stored as dc:identifier subproperties. (makes them queryable)
-    
     contenturi = getContentUri(context)
-
-    handler = getUtility(IORDF).getHandler()
     try:
+        handler = getUtility(IORDF).getHandler()
         graph = handler.get(contenturi)
     except Exception as e:
         LOG.error('could not retrieve graph for %s, %s', contenturi, e)
-        graph = Graph(identifier=URIRef(contenturi))
+        LOG.info("generate empty graph for %s", contenturi)
+        graph = Graph(identifier=contenturi)
     else:
         LOG.info('retrieved %d triples for %s', len(graph), graph.identifier)
 
@@ -32,7 +30,21 @@ def RepositoryMetadataAdapter(context):
 def getContentUri(context):
     #1. determine subject uri for context
     # FIXME: use property, attribute, context absolute url
-    uuid = IUUID(context)
+    
+    context = aq_base(context)
+    uuid = IUUID(context, None)
+    if uuid is None:
+        # we probably deal with a new contet object that does not have an uuid yet
+        # let's generate one
+        from plone.uuid.interfaces import IMutableUUID, IUUIDGenerator
+        generator = queryUtility(IUUIDGenerator)
+        if generator is None:
+            return  # TODO: raise error
+        uuid = generator()
+        if not uuid:
+            return  # TODO: raise error
+        IMutableUUID(context).set(uuid)
+    
     #url = base_uri + /@@redirect-to-uuid/<uuid>
     #uri = context.subjecturi
 
