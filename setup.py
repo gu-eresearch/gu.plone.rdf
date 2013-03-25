@@ -31,6 +31,7 @@ setup(name='gu.plone.rdf',
           'gu.z3cform.rdf',
           'ordf',
           'rdflib-zodb',
+          'collective.z3cform.datetimewidget'
       ],
       extras_require={
           'test': ['plone.app.testing', ]
