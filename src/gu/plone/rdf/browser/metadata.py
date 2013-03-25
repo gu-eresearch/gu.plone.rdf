@@ -9,10 +9,14 @@ from z3c.form.interfaces import IFormLayer
 #from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.browserpage import ViewPageTemplateFile
 from plone.z3cform import z2
-from Acquisition.interfaces import IAcquirer
-from Acquisition import aq_base
-from zope.component import createObject
-from plone.dexterity.utils import addContentToContainer
+# from Acquisition.interfaces import IAcquirer
+# from Acquisition import aq_base
+# from zope.component import createObject
+# from plone.dexterity.utils import addContentToContainer
+import logging
+
+LOG = logging.getLogger(__name__)
+
 
 # starting from 0.6.0 version plone.z3cform has IWrappedForm interface
 try:
@@ -26,19 +30,19 @@ class EditMetadataForm(FieldsFromLensMixin, group.GroupForm, form.EditForm):
 
     _graph = None
 
-    def getContent(self):
-        # make sure to load graph only once. Otherwise, we might reload
-        # data from store after applying changes.
-        if self._graph is None:
-            self._graph = IRepositoryMetadata(self.context)
-        return self._graph
+    # def getContent(self):
+    #     # make sure to load graph only once. Otherwise, we might reload
+    #     # data from store after applying changes.
+    #     if self._graph is None:
+    #         self._graph = IRepositoryMetadata(self.context)
+    #     return self._graph
 
-    def getContentGraph(self):
-        # groups expect this method.
-        # allows to work with two different content objects at once. (content, vs. graph)
-        # Might need to clean this up a bit, because this is only necessary for adding / editing 
-        # content fields and rdf fields at once.
-        return self.getContent()
+    # def getContentGraph(self):
+    #     # groups expect this method.
+    #     # allows to work with two different content objects at once. (content, vs. graph)
+    #     # Might need to clean this up a bit, because this is only necessary for adding / editing 
+    #     # content fields and rdf fields at once.
+    #     return self.getContent()
 
     def update(self):
         self.updateFields()
@@ -53,19 +57,19 @@ class ViewMetadataForm(FieldsFromLensMixin, group.GroupForm, form.Form):
 
     mode = DISPLAY_MODE
 
-    def getContent(self):
-        # make sure to load graph only once. Otherwise, we might reload
-        # data from store after applying changes.
-        if self._graph is None:
-            self._graph = IRepositoryMetadata(self.context)
-        return self._graph
+    # def getContent(self):
+    #     # make sure to load graph only once. Otherwise, we might reload
+    #     # data from store after applying changes.
+    #     if self._graph is None:
+    #         self._graph = IRepositoryMetadata(self.context)
+    #     return self._graph
 
-    def getContentGraph(self):
-        # groups expect this method.
-        # allows to work with two different content objects at once. (content, vs. graph)
-        # Might need to clean this up a bit, because this is only necessary for adding / editing 
-        # content fields and rdf fields at once.
-        return self.getContent()
+    # def getContentGraph(self):
+    #     # groups expect this method.
+    #     # allows to work with two different content objects at once. (content, vs. graph)
+    #     # Might need to clean this up a bit, because this is only necessary for adding / editing 
+    #     # content fields and rdf fields at once.
+    #     return self.getContent()
 
     def update(self):
         self.updateFields()
@@ -138,9 +142,9 @@ from plone.dexterity.browser.add import DefaultAddView, DefaultAddForm
 from ordf.graph import Graph
 from ordf.namespace import RDF
 from rdflib import Namespace
-from zope.component import getUtility
-from plone.dexterity.interfaces import IDexterityFTI
-from plone.dexterity.utils import createContent
+# from zope.component import getUtility
+# from plone.dexterity.interfaces import IDexterityFTI
+# from plone.dexterity.utils import createContent
 CVOCAB = Namespace(u"http://namespaces.griffith.edu.au/collection_vocab#")
 
 #class RDFAddForm(FieldsFromLensMixin, DefaultAddForm):
@@ -155,30 +159,43 @@ class RDFAddForm(DefaultAddForm):
     _graph = None
     content = None
 
-    def getContent(self):
-        # satisfy standard forms we use super.applyChanges and not form.applyChanges.
-        # super looks here for the actual content
-        if self.content is None: # this crudge is necessary, because not all parts clearly distinguish between context and content
-            return self.context
-        return self.content
+    # def getContent(self):
+    #     # satisfy standard forms we use super.applyChanges and not form.applyChanges.
+    #     # super looks here for the actual content
+    #     if self.content is None: # this crudge is necessary, because not all parts clearly distinguish between context and content
+    #         return self.context
+    #     return self.content
 
-    def getContentGraph(self):
-        # we are an add form. there is no conent:
+    # def getContentGraph(self):
+    #     # we are an add form. there is no conent:
+    #     if self._graph is None:
+    #         if self.content is None:
+    #             # two possibilities here. either don't store this temporary graph, or 
+    #             # set self._graph to None when we create the real content (in create())
+    #             _graph = Graph()
+    #             _graph.add((_graph.identifier, RDF['type'], CVOCAB['Item']))
+    #             return _graph
+    #         self._graph = IRepositoryMetadata(self.content)
+    #     return self._graph
+
+    def getEmptyGraph(self):
+        # need some minimal graph to work on. can't get graph for current context,
+        # because this is an add form and current context is the place where we add stuff to.
+        # not what we are going to create.
+        # FXME: maybe just specify Lens, and ignore empty graph?
         if self._graph is None:
-            if self.content is None:
-                # two possibilities here. either don't store this temporary graph, or 
-                # set self._graph to None when we create the real content (in create())
-                _graph = Graph()
-                _graph.add((_graph.identifier, RDF['type'], CVOCAB['Item']))
-                return _graph
-            self._graph = IRepositoryMetadata(self.content)
+            _graph = Graph()
+            _graph.add((_graph.identifier, RDF['type'], CVOCAB['Item']))
+            self._graph = _graph
         return self._graph
+            
 
     def updateFields(self):
         super(RDFAddForm, self).updateFields()
 
         from gu.z3cform.rdf.interfaces import IIndividual
-        individual = IIndividual(self.getContentGraph())
+        # FIXME: check why this is not reusable form the FieldsFromFresnelMixin. (is it the getEmptyGraph thingy?)
+        individual = IIndividual(self.getEmptyGraph())
         lens = getLens(individual)
         groups, fields = getFieldsFromFresnelLens(lens, individual.graph,
                                                   individual.identifier)
@@ -186,47 +203,57 @@ class RDFAddForm(DefaultAddForm):
         #       e.g. only move the main fields into group if a flag is turned
         #       on and/or there are other groups to be rendered
         g = RDFGroupFactory('Default_RDF_Lens', field.Fields(*fields),
-                            'RDF Metadat', None)
+                            'RDF Metadata', None)
         self.groups += (g, ) + groups
 
-    def create(self, data):
-        fti = getUtility(IDexterityFTI, name=self.portal_type)
-        content = createObject(fti.factory)
+        # apply widgetFactories here
+        for g in (self, ) + self.groups:
+            for f in g.fields.values():
+                if hasattr(f.field, 'widgetFactory'):
+                    LOG.info('apply costum widgetFactory %s to for field %s', str(f.field.widgetFactory), f.field.__name__)
+                    f.widgetFactory = f.field.widgetFactory
 
-        # Note: The factory may have done this already, but we want to be sure
-        # that the created type has the right portal type. It is possible
-        # to re-define a type through the web that uses the factory from an
-        # existing type, but wants a unique portal_type!
 
-        # TODO: how can it be that fti.getId() would be different for the same portal_type?
-        #if hasattr(content, '_setPortalTypeName'):
-        #    content._setPortalTypeName(fti.getId())
-        if hasattr(content, '_setPortalTypeName'):
-            content._setPortalTypeName(self.portal_type)
+    # def create(self, data):
+    #     fti = getUtility(IDexterityFTI, name=self.portal_type)
+    #     content = createObject(fti.factory)
 
-        return aq_base(content)
+    #     # Note: The factory may have done this already, but we want to be sure
+    #     # that the created type has the right portal type. It is possible
+    #     # to re-define a type through the web that uses the factory from an
+    #     # existing type, but wants a unique portal_type!
 
-    def add(self, object):
-        fti = getUtility(IDexterityFTI, name=self.portal_type)
-        container = aq_inner(self.context)
-        new_object = addContentToContainer(container, object)
-        # now we have a full content object we can work with; with real location etc...
-        self.content = new_object
+    #     # TODO: how can it be that fti.getId() would be different for the same portal_type?
+    #     #if hasattr(content, '_setPortalTypeName'):
+    #     #    content._setPortalTypeName(fti.getId())
+    #     if hasattr(content, '_setPortalTypeName'):
+    #         content._setPortalTypeName(self.portal_type)
+
+    #     return aq_base(content)
+
+    # def add(self, object):
+    #     fti = getUtility(IDexterityFTI, name=self.portal_type)
+    #     container = aq_inner(self.context)
+    #     new_object = addContentToContainer(container, object)
+    #     # now we have a full content object we can work with; with real location etc...
+    #     self.content = new_object
         
-        if fti.immediate_view:
-            self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, fti.immediate_view,)
-        else:
-            self.immediate_view = "%s/%s" % (container.absolute_url(), new_object.id)
+    #     if fti.immediate_view:
+    #         self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, fti.immediate_view,)
+    #     else:
+    #         self.immediate_view = "%s/%s" % (container.absolute_url(), new_object.id)
 
-    def createAndAdd(self, data):
-        new_object = super(RDFAddForm, self).createAndAdd(data)
-        # everything is created and added, we can apply all of our data now
-        self.applyChanges(data)
-        # another way to make this apply work, would be to defer the data update in an event listener.
-        # this way one could use the default forms for all content fields, and use the event handler
-        # to apply the rest. (relationfield works in a similar way, where a relation can only be finalised
-        # when the actual objects exist)
-        return new_object
+    # def createAndAdd(self, data):
+
+    #     import ipdb; ipdb.set_trace()
+    #     new_object = super(RDFAddForm, self).createAndAdd(data)
+    #     # everything is created and added, we can apply all of our data now
+    #     # self.applyChanges(data)
+    #     # another way to make this apply work, would be to defer the data update in an event listener.
+    #     # this way one could use the default forms for all content fields, and use the event handler
+    #     # to apply the rest. (relationfield works in a similar way, where a relation can only be finalised
+    #     # when the actual objects exist)
+    #     return new_object
 
 
 
