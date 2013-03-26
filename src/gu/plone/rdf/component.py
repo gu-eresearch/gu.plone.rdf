@@ -59,10 +59,13 @@ class ORDFUtility(object):
         if self.handler is None:
             registry = getUtility(IRegistry)
             settings = registry.forInterface(IRDFSettings, check=False)
-            conf_str = "[ordf]\n" + settings.ordf_configuration
-            cp = ConfigParser.SafeConfigParser()
-            cp.readfp(StringIO(conf_str.encode('utf-8')))
-            config = dict(cp.items('ordf'))
+            if settings.ordf_configuration:
+                conf_str = "[ordf]\n" + settings.ordf_configuration
+                cp = ConfigParser.SafeConfigParser()
+                cp.readfp(StringIO(conf_str.encode('utf-8')))
+                config = dict(cp.items('ordf'))
+            else:
+                config = dict()
             self.handler = init_handler(config)
         return self.handler
 
@@ -78,7 +81,7 @@ class ORDFUtility(object):
 
     def getFresnel(self):
         if self.fresnel is None:
-            LOG.info("reading fresnel graph form triple store")
+            LOG.info("reading fresnel graph from triple store")
             #rdfhandler = self.getHandler()
             registry = getUtility(IRegistry)
             settings = registry.forInterface(IRDFSettings, check=False)
