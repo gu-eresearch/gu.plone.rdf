@@ -1,0 +1,30 @@
+<configure
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    i18n_domain="gu.plone.rdf">
+
+    <!-- DateRange widget -->
+    <adapter
+        factory=".widget_daterange.DateRangeFieldWidget" />
+
+    <z3c:widgetTemplate
+        mode="display"
+        widget="..interfaces.IDateRangeWidget"        
+        layer="z3c.form.interfaces.IFormLayer"
+        template="daterange_display.pt" />
+    <z3c:widgetTemplate
+        mode="input"
+        widget="..interfaces.IDateRangeWidget"        
+        layer="z3c.form.interfaces.IFormLayer"
+        template="daterange_input.pt" />
+    <z3c:widgetTemplate
+        mode="hidden"
+        widget="..interfaces.IDateRangeWidget"        
+        layer="z3c.form.interfaces.IFormLayer"
+        template="daterange_hidden.pt" />
+
+</configure>

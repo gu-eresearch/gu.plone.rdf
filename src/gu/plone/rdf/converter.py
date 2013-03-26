@@ -2,7 +2,7 @@
 from collective.z3cform.datetimewidget.interfaces import DateValidationError
 from gu.z3cform.rdf.converter import BaseDataConverter, RDFObjectSubForm
 from rdflib import Literal
-from ordf.namespace import XSD
+from ordf.namespace import XSD, DC
 from datetime import date
 from plone.app.z3cform.interfaces import IPloneFormLayer
 import zope.interface
@@ -10,6 +10,7 @@ import zope.component
 from z3c.form.interfaces import ISubformFactory
 from gu.z3cform.rdf.interfaces import IRDFObjectField
 from gu.z3cform.rdf.widgets.interfaces import IRDFObjectWidget
+from isodate import parse_date
 
 
 class RDFDateDataConverter(BaseDataConverter):
@@ -42,6 +43,46 @@ class RDFDateDataConverter(BaseDataConverter):
         return Literal(value, datatype=XSD['date'])
 
 
+class RDFDateRangeConverter(BaseDataConverter):
+
+    def toWidgetValue(self, value):
+        if value is self.field.missing_value:
+            return {'start': ('', '', ''),
+                    'end': ('', '', '')}
+        # TODO: check literal datatype?
+        period = Period(value)
+        # TODO: check onceding scheme in case of period
+        start = parse_date(period.start)
+        end = parse_date(period.end)
+        return {'start': (start.year, start.month, start.day),
+                'end': (end.year, end.month, end.day)}
+
+    def toFieldValue(self, value):
+        for val in value['start']:
+            if not val:
+                return self.field.missing_value
+        for val in value['end']:
+            if not val:
+                return self.field.missing_value
+
+        try:
+            value = {'start': map(int, value['start']),
+                     'end': map(int, value['end'])}
+        except ValueError:
+            raise DateValidationError
+        try:
+            value = {'start': date(*value['start']),
+                     'end': date(*value['end'])}
+        except ValueError:
+            raise DateValidationError
+        # FIXEM: generate correct dcmi period here
+        litval = Period('')
+        litval.start = value['start'].isoformat()
+        litval.end = value['end'].isoformat()
+        litval.scheme = 'W3C-DTF'
+        return Literal(unicode(litval), datatype=DC['Period'])
+
+
 class SubformAdapter(object):
     """Most basic-default subform factory adapter"""
 
@@ -68,3 +109,50 @@ class SubformAdapter(object):
     def __call__(self):
         obj = self.factory(self.context, self.request, self.widget)
         return obj
+
+
+import re
+
+
+class Period(object):
+    """
+    Parse DCMI period strings and provide values as attributes.
+
+    Format set period values as valid DCMI period.
+
+    FIXME: currently uses date strings as is and does not try to interpret
+           them.
+           the same for formatting. date's have to be given as properly
+           formatted strings.
+    """
+
+    start = end = scheme = name = None
+
+    def __init__(self, str):
+        '''
+        TODO: assumes str is unicode
+        '''
+        sm = re.search(r'start=(.*?);', str)
+        if sm:
+            self.start = sm.group(1)
+        sm = re.search(r'scheme=(.*?);', str)
+        if sm:
+            self.scheme = sm.group(1)
+        sm = re.search(r'end=(.*?);', str)
+        if sm:
+            self.end = sm.group(1)
+        sm = re.search(r'name=(.*?);', str)
+        if sm:
+            self.name = sm.group(1)
+
+    def __unicode__(self):
+        parts = []
+        if self.start:
+            parts.append("start=%s;" % self.start)
+        if self.end:
+            parts.append("end=%s;" % self.end)
+        if self.name:
+            parts.append("name=%s;" % self.name)
+        if self.scheme:
+            parts.append("scheme=%s;" % self.scheme)
+        return u' '.join(parts)

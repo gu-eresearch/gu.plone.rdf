@@ -10,6 +10,7 @@
 
   <include file="profiles.zcml"/>
   <include package=".browser" />
+  <include package=".widget" />
 
   <utility
       factory=".component.ORDFUtility" />
@@ -57,6 +58,11 @@
         factory=".converter.RDFDateDataConverter"
         for="gu.z3cform.rdf.interfaces.IRDFDateField
              collective.z3cform.datetimewidget.interfaces.IDateWidget" />
+
+    <adapter
+        factory=".converter.RDFDateRangeConverter"
+        for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
+             .interfaces.IDateRangeWidget" />
 
 <!-- <subscriber -->
 <!--     	for="..interfaces.IObjectInterface  -->

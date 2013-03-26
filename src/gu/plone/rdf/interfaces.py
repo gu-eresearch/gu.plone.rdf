@@ -1,4 +1,5 @@
 from zope import schema
+from z3c.form.interfaces import IWidget
 from zope.interface import Interface
 from gu.plone.rdf import _
 
@@ -15,7 +16,7 @@ class IRDFSettings(Interface):
 
     fresnel_graph_uri = schema.URI(
         title=_(u"Fresnel Graph URI"),
-        required=True,
+        required=True
         )
 
     base_uri = schema.URI(
@@ -23,3 +24,7 @@ class IRDFSettings(Interface):
         description=_(u"URI preix used for locally generated content. "
                       u"It should end with # or /"),
         required=True)
+
+
+class IDateRangeWidget(IWidget):
+    """ Date range widget. """

@@ -1,0 +1,4 @@
+<tal:root>
+    <tal:replace tal:content="structure view/widgets/start/render"></tal:replace>
+    <tal:replace tal:content="structure view/widgets/end/render"></tal:replace>
+</tal:root>

@@ -1,0 +1,10 @@
+<tal:root>
+    <div id="" class=""
+         tal:attributes="id view/id;
+                         class view/klass;">
+        <span tal:content="view/widgets/start/label"></span>
+        <tal:replace tal:content="structure view/widgets/start/render"></tal:replace>
+        <span tal:content="view/widgets/end/label"></span>
+        <tal:replace tal:content="structure view/widgets/end/render"></tal:replace>
+    </div>
+</tal:root>
