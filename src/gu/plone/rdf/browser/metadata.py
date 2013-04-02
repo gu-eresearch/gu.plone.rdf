@@ -207,7 +207,7 @@ class RDFAddForm(DefaultAddForm):
         self.groups += (g, ) + groups
 
         # apply widgetFactories here
-        for g in (self, ) + self.groups:
+        for g in (self, ) + tuple(self.groups):
             for f in g.fields.values():
                 if hasattr(f.field, 'widgetFactory'):
                     LOG.info('apply costum widgetFactory %s to for field %s', str(f.field.widgetFactory), f.field.__name__)
