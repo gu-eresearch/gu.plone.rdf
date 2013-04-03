@@ -27,4 +27,10 @@
         layer="z3c.form.interfaces.IFormLayer"
         template="daterange_hidden.pt" />
 
+    <z3c:widgetTemplate
+        mode="display"
+        widget="..interfaces.IDiscoverFacetWidget "
+        layer="z3c.form.interfaces.IFormLayer"
+        template="discoverfacet_input.pt" />
+
 </configure>

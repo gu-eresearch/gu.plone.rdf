@@ -1,0 +1,32 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      tal:omit-tag="">
+<span id="" class=""
+      tal:attributes="id view/id;
+                      class view/klass;
+                      style view/style;
+                      title view/title;
+                      lang view/lang;
+                      onclick view/onclick;
+                      ondblclick view/ondblclick;
+                      onmousedown view/onmousedown;
+                      onmouseup view/onmouseup;
+                      onmouseover view/onmouseover;
+                      onmousemove view/onmousemove;
+                      onmouseout view/onmouseout;
+                      onkeypress view/onkeypress;
+                      onkeydown view/onkeydown;
+                      onkeyup view/onkeyup">
+    <tal:block repeat="item view/selectedItems">
+        <a href=""
+           class="link-category selected-option"
+           rel="tag"
+           tal:content="item/content"
+           tal:define="url_quote nocall:modules/Products.PythonScripts.standard/url_quote;
+                       quotedValue python:url_quote(item['value'])"
+           tal:attributes="href string:${context/@@plone_portal_state/navigation_root_url}/discover?include_subfolders&amp;facet.Sector=${quotedValue}">
+           Category</a>
+        <span class="separator" tal:condition="not: repeat/item/end">,</span>
+    </tal:block>
+  </span>
+</html>

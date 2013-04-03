@@ -28,3 +28,6 @@ class IRDFSettings(Interface):
 
 class IDateRangeWidget(IWidget):
     """ Date range widget. """
+
+class IDiscoverFacetWidget(IWidget):
+    """ Used to render facet search links. """
