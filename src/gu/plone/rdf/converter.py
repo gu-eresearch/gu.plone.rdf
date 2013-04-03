@@ -46,16 +46,20 @@ class RDFDateDataConverter(BaseDataConverter):
 class RDFDateRangeConverter(BaseDataConverter):
 
     def toWidgetValue(self, value):
+        ret = {'start': ('', '', ''),
+               'end': ('', '', '')}
         if value is self.field.missing_value:
-            return {'start': ('', '', ''),
-                    'end': ('', '', '')}
+            return ret
         # TODO: check literal datatype?
         period = Period(value)
-        # TODO: check onceding scheme in case of period
-        start = parse_date(period.start)
-        end = parse_date(period.end)
-        return {'start': (start.year, start.month, start.day),
-                'end': (end.year, end.month, end.day)}
+        # TODO: check encoding scheme in case of period
+        if period.start:
+            start = parse_date(period.start)
+            ret['start'] = (start.year, start.month, start.day)
+        if period.end:
+            end = parse_date(period.end)
+            ret['end'] = (end.year, end.month, end.day)
+        return ret
 
     def toFieldValue(self, value):
         for val in value['start']:
