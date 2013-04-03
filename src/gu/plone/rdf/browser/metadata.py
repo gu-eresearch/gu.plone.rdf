@@ -1,7 +1,7 @@
 from gu.z3cform.rdf.fresnel.edit import FieldsFromLensMixin, RDFGroupFactory, getFieldsFromFresnelLens, getLens
 from gu.repository.content.interfaces import IRepositoryMetadata
 from z3c.form import form, field, group
-from z3c.form.interfaces import DISPLAY_MODE
+from z3c.form.interfaces import DISPLAY_MODE, HIDDEN_MODE, INPUT_MODE
 from plone.app.layout.viewlets import ViewletBase
 from Acquisition import aq_inner
 from zope.interface import alsoProvides
@@ -211,7 +211,11 @@ class RDFAddForm(DefaultAddForm):
             for f in g.fields.values():
                 if hasattr(f.field, 'widgetFactory'):
                     LOG.info('apply costum widgetFactory %s to for field %s', str(f.field.widgetFactory), f.field.__name__)
-                    f.widgetFactory = f.field.widgetFactory
+                    if isinstance(f.field.widgetFactory, dict):
+                        for key, value in f.field.widgetFactory.items():
+                            f.widgetFactory[key] = value
+                    else:
+                        f.widgetFactory = f.field.widgetFactory
 
 
     # def create(self, data):
