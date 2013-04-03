@@ -77,7 +77,7 @@ def ModifyGraph(object, event):
     # FIXME: might need to update other graph triples here too :) ... e.g. map plone dc fields to graph fields
     LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
     graph = IRepositoryMetadata(object)
-    oldlen = len(graph)  # good enought for the current type of changes we do
+    oldlen = len(graph)  # good enough for the current type of changes we do
     LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
     graph.add((graph.identifier, RDF['type'], OWL['Thing']))
     if len(graph) != oldlen:
