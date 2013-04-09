@@ -4,6 +4,10 @@ from gu.repository.content.interfaces import IRepositoryContainer, IRepositoryIt
 from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
 from rdflib import RDF, RDFS, Namespace, Literal, OWL
+# FIXME: the following imports need to go away
+from ordf.namespace import FOAF
+from org.terranova.site.content.user import ITerranovaUser
+from org.terranova.site.content.group import ITerranovaGroup
 
 import logging
 LOG = logging.getLogger(__name__)
@@ -53,6 +57,10 @@ def InitialiseGraph(object, event):
         graph.add((graph.identifier, RDF['type'], CVOCAB['Item']))
     elif IRepositoryContainer.providedBy(event.object):
         graph.add((graph.identifier, RDF['type'], CVOCAB['Collection']))
+    elif ITerranovaUser.providedBy(object):
+        graph.add((graph.identifier, RDF['type'], FOAF['Person']))
+    elif ITerranovaGroup.providedBy(object):
+        graph.add((graph.identifier, RDF['type'], FOAF['Group']))  # foaf:Organization
         
     graph.add((graph.identifier, RDF['type'], OWL['Thing']))
     # FIXME: use only noe way to describ ethings ....
@@ -87,11 +95,6 @@ def ModifyGraph(object, event):
         handler.put(graph)
 
 
-# FIXME: this DataManager should go into a base package
-# in the long term, this should be done via a datamanager that works within the current transaction,
-# and supprots savepoints too
-import transaction
-        
 def RemoveGraph(object, event):
     LOG.info("Item: %s has been deleted: %s", repr(object), repr(event))
     # TODO: clean up removed triples ...
