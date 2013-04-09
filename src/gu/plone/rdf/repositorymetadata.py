@@ -15,11 +15,13 @@ def RepositoryMetadataAdapter(context):
     # ... use uuid to generate URIs.
     # users may give additional URIs / identifiers to be stored as dc:identifier subproperties. (makes them queryable)
     contenturi = getContentUri(context)
+    graph = None
     try:
         handler = getUtility(IORDF).getHandler()
         graph = handler.get(contenturi)
     except Exception as e:
         LOG.error('could not retrieve graph for %s, %s', contenturi, e)
+    if graph is None:
         LOG.info("generate empty graph for %s", contenturi)
         graph = Graph(identifier=contenturi)
     else:
