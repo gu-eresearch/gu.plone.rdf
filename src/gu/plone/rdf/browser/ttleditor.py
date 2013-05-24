@@ -42,7 +42,7 @@ class TTLEditForm(form.SchemaForm):
             term = self.widgets['graph'].terms.getTerm(g.identifier)
             #self.widgets['graph'].value = term
             self.widgets['graph'].value = [term.token]
-            self.widgets['graph'].style = "width:500px"
+            self.widgets['graph'].style = u"width:500px"
         except Exception, e:
             msg = u"can't load current context: %s" % str(e)
             msg_type = 'error'
@@ -66,11 +66,11 @@ class TTLEditForm(form.SchemaForm):
         try:
             self.widgets['ttl'].value = graph.serialize(format="turtle")
         except Exception, e:
-            msg = u"RDF upload failed: %s" % str(e)
+            msg = u"RDF load failed: %s" % str(e)
             msg_type = 'error'
             self.request.response.setStatus(status=400, reason='Import failed')
         else:
-            msg = u"RDF upload successful"
+            msg = u"RDF load successful"
             msg_type = 'info'
         IStatusMessage(self.request).add(msg, type=msg_type)
 

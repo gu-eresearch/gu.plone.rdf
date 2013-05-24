@@ -122,4 +122,5 @@ class ORDFUtility(object):
         raise NotImplementedError()
 
     def clearCache(self):
+        # TODO: update all other instances too ... maybe store fresnel in memcached?
         self.fresnel = None
