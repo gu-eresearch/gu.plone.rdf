@@ -1,24 +1,16 @@
 from zope.lifecycleevent.interfaces import IObjectAddedEvent, IObjectModifiedEvent, IObjectRemovedEvent
 from gu.repository.content.interfaces import IRepositoryMetadata
-from gu.repository.content.interfaces import IRepositoryContainer, IRepositoryItem
 from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
-from rdflib import RDF, RDFS, Namespace, Literal, OWL
-# FIXME: the following imports need to go away
-from ordf.namespace import FOAF
-from org.terranova.site.content.user import ITerranovaUser
-from org.terranova.site.content.group import ITerranovaGroup
+from rdflib import RDF, OWL
+from zope.component import getUtilitiesFor
+from gu.plone.rdf.interfaces import IRDFContentTransform
+from Acquisition import aq_parent, aq_inner, aq_base
+from zope.publisher.interfaces.browser import IBrowserRequest
 
 import logging
 LOG = logging.getLogger(__name__)
 
-# FIXME: move these to central place
-DCTERMS = Namespace(u"http://purl.org/dc/terms/")
-CVOCAB = Namespace(u"http://namespaces.griffith.edu.au/collection_vocab#")
-
-
-from Acquisition import aq_parent, aq_inner, aq_base
-from zope.publisher.interfaces.browser import IBrowserRequest
 
 def isTemporaryItem(obj, checkId=True):
     """ check if the item has an acquisition chain set up and is not of
@@ -53,27 +45,10 @@ def InitialiseGraph(object, event):
         return
     graph = IRepositoryMetadata(object)
     LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
-    if IRepositoryItem.providedBy(object):
-        graph.add((graph.identifier, RDF['type'], CVOCAB['Item']))
-    elif IRepositoryContainer.providedBy(event.object):
-        graph.add((graph.identifier, RDF['type'], CVOCAB['Collection']))
-    elif ITerranovaUser.providedBy(object):
-        graph.add((graph.identifier, RDF['type'], FOAF['Person']))
-    elif ITerranovaGroup.providedBy(object):
-        graph.add((graph.identifier, RDF['type'], FOAF['Group']))  # foaf:Organization
-        
-    graph.add((graph.identifier, RDF['type'], OWL['Thing']))
-    # FIXME: use only noe way to describ ethings ....
-    #        see dc - rdf mapping at http://dublincore.org/documents/dcq-rdf-xml/
-    #        maybe dc app profile not as good as it might sound, but translated to RDF is better (or even owl)
-    for prop, val in ((DCTERMS['title'], Literal(object.title)),
-                      (RDFS['label'], Literal(object.title)),
-                      (DCTERMS['description'], Literal(object.description)),
-                      (RDFS['comment'], Literal(object.description)),
-                      ):
-        if not graph.value(graph.identifier, prop):
-            graph.add((graph.identifier, prop, val))
-    # FIXME: persist stuff here? (would be nice to make this part of normal transaction)
+    # lookup all transform utilities and call them
+    transformers = getUtilitiesFor(IRDFContentTransform)
+    for transname, transtool in transformers:
+        transtool.tordf(object, graph)
     handler = getUtility(IORDF).getHandler()
     # ... check for temporary folder...
     LOG.info("Initialise new item %s at %s", repr(object), repr(event.newParent))
@@ -83,6 +58,7 @@ def InitialiseGraph(object, event):
 
 def ModifyGraph(object, event):
     # FIXME: might need to update other graph triples here too :) ... e.g. map plone dc fields to graph fields
+    # FIXME: use transformers here too?
     LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
     graph = IRepositoryMetadata(object)
     oldlen = len(graph)  # good enough for the current type of changes we do
