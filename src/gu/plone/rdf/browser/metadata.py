@@ -27,6 +27,9 @@ except ImportError:
 
 
 class EditMetadataForm(FieldsFromLensMixin, group.GroupForm, form.EditForm):
+    """
+    An edit form which uses a fresnel lens to generate fields for current context.
+    """
 
     _graph = None
 
@@ -50,6 +53,10 @@ class EditMetadataForm(FieldsFromLensMixin, group.GroupForm, form.EditForm):
 
 
 class ViewMetadataForm(FieldsFromLensMixin, group.GroupForm, form.Form):
+    """
+    A display form which uses a fresnel lens to generate fields for current context.
+    """
+
 
     id = 'view_metadata'
 
@@ -77,6 +84,9 @@ class ViewMetadataForm(FieldsFromLensMixin, group.GroupForm, form.Form):
 
 
 class ViewMetadataViewlet(ViewletBase):
+    """
+    A viewlet that uses ViewMetadataForm to show rdf metadata about given context
+    """
 
     index = ViewPageTemplateFile('rdfviewlet.pt')
     label = 'Metadata'
@@ -124,7 +134,6 @@ class RDFFieldExtender(FieldsFromLensMixin, FormExtender):
 
 
     def update(self):
-        import ipdb; ipdb.set_trace()
         self.updateFields()
         self.add(self.fields)
         groups = list(self.form.groups)
@@ -139,6 +148,7 @@ class RDFFieldExtender(FieldsFromLensMixin, FormExtender):
 #       3. needs fresnel group and at least one rdf:type
 
 from plone.dexterity.browser.add import DefaultAddView, DefaultAddForm
+from plone.dexterity.browser.edit import DefaultEditForm
 from ordf.graph import Graph
 from ordf.namespace import RDF
 from rdflib import Namespace
@@ -147,8 +157,25 @@ from rdflib import Namespace
 # from plone.dexterity.utils import createContent
 CVOCAB = Namespace(u"http://namespaces.griffith.edu.au/collection_vocab#")
 
+class RDFEditForm(FieldsFromLensMixin, DefaultEditForm):
+    """
+    An EditForm that mixes plone content fields and rdf fields (from a fresnel lens)
+    """
+
+    content = None
+
+    # dexterity base update calls updateFields so we don't have to ourselvels
+    # def update(self):
+    #     self.updateFields()
+    #     super(RDFEditForm, self).update()
+
+
+
 #class RDFAddForm(FieldsFromLensMixin, DefaultAddForm):
 class RDFAddForm(DefaultAddForm):
+    """
+    An AddForm that mixes plone content fields and rdf fields (from a fresnel lens)
+    """
     # this form allows to add content + rdf metadat in one go.
     # the normal content fields are generated as usual, but the rdf
     # fields need to be in (form) Groups. Otherwise it would be impossible
@@ -185,6 +212,7 @@ class RDFAddForm(DefaultAddForm):
         # FXME: maybe just specify Lens, and ignore empty graph?
         if self._graph is None:
             _graph = Graph()
+            # TODO: can I use the TypeMapper utility to find the correct rdf:type?
             _graph.add((_graph.identifier, RDF['type'], CVOCAB['Item']))
             self._graph = _graph
         return self._graph
@@ -197,14 +225,26 @@ class RDFAddForm(DefaultAddForm):
         # FIXME: check why this is not reusable form the FieldsFromFresnelMixin. (is it the getEmptyGraph thingy?)
         individual = IIndividual(self.getEmptyGraph())
         lens = getLens(individual)
-        groups, fields = getFieldsFromFresnelLens(lens, individual.graph,
-                                                  individual.identifier)
-        # TODO: this should also be done in the FieldLensMixin.
-        #       e.g. only move the main fields into group if a flag is turned
-        #       on and/or there are other groups to be rendered
-        g = RDFGroupFactory('Default_RDF_Lens', field.Fields(*fields),
-                            'RDF Metadata', None)
-        self.groups += (g, ) + groups
+        LOG.info('individual types: %s', individual.type)
+        LOG.info('picked lens: %s', lens)
+        fields = []
+        groups = ()
+        if lens is not None:
+            groups, fields = getFieldsFromFresnelLens(lens, individual.graph,
+                                                      individual.identifier)
+
+        if hasattr(self, 'groups'):
+            if self.groups or groups:
+                g = RDFGroupFactory('Default_RDF_Lens', field.Fields(*fields),
+                                    'RDF Metadata', None)
+                fields = ()
+                groups = (g, ) + groups
+            self.groups += groups
+
+        if self.fields is not None:
+            self.fields += field.Fields(*fields)
+        else:
+            self.fields = field.Fields(*fields)
 
         # apply widgetFactories here
         for g in (self, ) + tuple(self.groups):
@@ -216,7 +256,6 @@ class RDFAddForm(DefaultAddForm):
                             f.widgetFactory[key] = value
                     else:
                         f.widgetFactory = f.field.widgetFactory
-
 
     # def create(self, data):
     #     fti = getUtility(IDexterityFTI, name=self.portal_type)

@@ -20,4 +20,11 @@
         permission="cmf.ModifyPortalContent"
     />
 
+    <browser:view
+        name="edit_full_metadata"
+        class=".browser.metadata.RDFEditForm"
+        for="zope.annotation.interfaces.IAttributeAnnotatable"
+        permission="cmf.ModifyPortalContent"
+    />
+
 </configure>
