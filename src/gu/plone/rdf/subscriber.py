@@ -61,14 +61,13 @@ def ModifyGraph(object, event):
     # FIXME: use transformers here too?
     LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
     graph = IRepositoryMetadata(object)
-    oldlen = len(graph)  # good enough for the current type of changes we do
-    LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
-    graph.add((graph.identifier, RDF['type'], OWL['Thing']))
-    if len(graph) != oldlen:
-        # FIXME: make persistence part of transaction commit
-        handler = getUtility(IORDF).getHandler()
-        LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
-        handler.put(graph)
+    LOG.info("Got %d triples for item %s", len(graph), graph.identifier)
+    transformers = getUtilitiesFor(IRDFContentTransform)
+    for transname, transtool in transformers:
+        transtool.tordf(object, graph)
+    handler = getUtility(IORDF).getHandler()
+    LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
+    handler.put(graph)
 
 
 def RemoveGraph(object, event):
@@ -84,5 +83,3 @@ def RemoveGraph(object, event):
     # 2. query all triples where graph.identifier is object and clear those too
     #    -> generates changeset
     #    if this is part of a relation document, clear the whole document?
-
-
