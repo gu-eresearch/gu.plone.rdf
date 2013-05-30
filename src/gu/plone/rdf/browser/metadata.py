@@ -234,7 +234,7 @@ class RDFAddForm(DefaultAddForm):
                                                       individual.identifier)
 
         if hasattr(self, 'groups'):
-            if self.groups or groups:
+            if (self.groups or groups) and fields:
                 g = RDFGroupFactory('Default_RDF_Lens', field.Fields(*fields),
                                     'RDF Metadata', None)
                 fields = ()
