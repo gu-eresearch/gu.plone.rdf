@@ -24,6 +24,10 @@ setup(name='gu.plone.rdf',
       namespace_packages=['gu', 'gu.plone' ],
       include_package_data=True,
       zip_safe=False,
+      dependency_links=[
+          'https://github.com/gweis/rdflib-zodb/archive/master.zip#egg=rdflib-zodb',
+          'https://bitbucket.org/prologic/gu.z3cform.rdf/get/master.zip#egg=gu.z3cform.rdf',
+      ],
       install_requires=[
           'setuptools',
           'Products.CMFPlone',
