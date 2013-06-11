@@ -1,0 +1,6 @@
+syntax: glob
+
+.git
+dist
+build
+*egg-info
