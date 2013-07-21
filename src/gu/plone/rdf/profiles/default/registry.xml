@@ -1,30 +1,5 @@
 <registry>
   <records interface="gu.plone.rdf.interfaces.IRDFSettings">
-    <value key="ordf_configuration">ordf.handler = ordf.handler:Handler
-# ordf.readers = rdflib, sesame2, ....
-ordf.readers = sesame2
-# ordf.writers = ausncrabbit,rabbit, rdflib, sesam2
-ordf.writers = ausncrabbit
-
-sesame2.url = http://localhost:8982/openrdf-sesame/
-sesame2.repository = ausncdev
-
-rdflib.store = Sesame2Store
-rdflib.url = http://localhost:8982/openrdf-sesame/
-rdflib.repository = ausncdev
-
-rabbit.hostname = localhost
-rabbit.userid = guest
-rabbit.password = guest
-rabbit.connect.exchange = rdfupdates
-#rabbit.connect.exchange_type = ???
-
-ausncrabbit.hostname = localhost
-ausncrabbit.userid = guest
-ausncrabbit.password = guest
-ausncrabbit.connect.exchange = rdfupdates
-#rabbit.connect.exchange_type = ???
-</value>
     <value key="fresnel_graph_uri">http://namespaces.griffith.edu.au/FRESNEL</value>
   </records>
 </registry>

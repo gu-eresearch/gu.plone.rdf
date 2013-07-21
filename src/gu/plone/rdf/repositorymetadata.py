@@ -1,11 +1,10 @@
 from plone.uuid.interfaces import IUUID
 from zope.component import getUtility, queryUtility
 from gu.z3cform.rdf.interfaces import IORDF
-from gu.plone.rdf.interfaces import IRDFSettings
-from plone.registry.interfaces import IRegistry
 from ordf.graph import Graph
 import logging
 from Acquisition import aq_base
+from App.config import getConfiguration
 
 
 LOG = logging.getLogger(__name__)
@@ -50,8 +49,7 @@ def getContentUri(context):
     #url = base_uri + /@@redirect-to-uuid/<uuid>
     #uri = context.subjecturi
 
-    registry = getUtility(IRegistry)
-    settings = registry.forInterface(IRDFSettings, check=False)
-
-    contenturi = "%s%s" % (settings.base_uri, uuid)
+    settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
+    
+    contenturi = "%s%s" % (settings.get('baseuri'), uuid)
     return contenturi

@@ -1,3 +1,4 @@
+from App.config import getConfiguration
 import ConfigParser
 import logging
 from cStringIO import StringIO
@@ -57,15 +58,12 @@ class ORDFUtility(object):
     # TODO: check if it is ok to cache handler forever (e.g... connection to store not closed or unexpectedly closed on graph.glose()?)
     def getHandler(self):
         if self.handler is None:
-            registry = getUtility(IRegistry)
-            settings = registry.forInterface(IRDFSettings, check=False)
-            if settings.ordf_configuration:
-                conf_str = "[ordf]\n" + settings.ordf_configuration
-                cp = ConfigParser.SafeConfigParser()
-                cp.readfp(StringIO(conf_str.encode('utf-8')))
-                config = dict(cp.items('ordf'))
-            else:
-                config = dict()
+            zconfig = getConfiguration()
+            zconfig = zconfig.product_config.get('gu.plone.rdf', dict())
+            ordfini = zconfig.get('inifile')
+            cp = ConfigParser.SafeConfigParser()
+            cp.read(ordfini)
+            config = dict(cp.items('ordf'))
             self.handler = init_handler(config)
         return self.handler
 
