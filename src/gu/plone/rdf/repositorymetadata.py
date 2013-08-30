@@ -31,7 +31,7 @@ def RepositoryMetadataAdapter(context):
 def getContentUri(context):
     #1. determine subject uri for context
     # FIXME: use property, attribute, context absolute url
-    
+
     context = aq_base(context)
     uuid = IUUID(context, None)
     if uuid is None:
@@ -45,11 +45,11 @@ def getContentUri(context):
         if not uuid:
             return  # TODO: raise error
         IMutableUUID(context).set(uuid)
-    
+
     #url = base_uri + /@@redirect-to-uuid/<uuid>
     #uri = context.subjecturi
 
     settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
-    
+
     contenturi = "%s%s" % (settings.get('baseuri'), uuid)
     return contenturi
