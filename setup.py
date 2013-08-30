@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '2.0dev'
+version = '2.0'
 
 setup(name='gu.plone.rdf',
       version=version,
@@ -28,9 +28,9 @@ setup(name='gu.plone.rdf',
           'setuptools',
           'Products.CMFPlone',
           'plone.app.registry',
-          'gu.z3cform.rdf',
+          'gu.z3cform.rdf<0.5dev',
           'ordf',
-          'rdflib-zodb',
+          'rdflib-zodb<1.0dev',
           'collective.z3cform.datetimewidget'
       ],
       extras_require={
