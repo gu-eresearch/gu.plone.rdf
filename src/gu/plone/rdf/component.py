@@ -64,7 +64,7 @@ class ORDFUtility(object):
             cp = ConfigParser.SafeConfigParser()
             cp.read(ordfini)
             config = dict(cp.items('ordf'))
-            if config['rdflib.store'] ==  'ZODB':
+            if config.get('rdflib.store', None) ==  'ZODB':
                 # TODO: this here could be optimised
                 #   for ZODB there is no need to go through handler
                 #   as read write is protected by transactions
