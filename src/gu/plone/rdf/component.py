@@ -64,7 +64,29 @@ class ORDFUtility(object):
             cp = ConfigParser.SafeConfigParser()
             cp.read(ordfini)
             config = dict(cp.items('ordf'))
-            self.handler = init_handler(config)
+            if config['rdflib.store'] ==  'ZODB':
+                # TODO: this here could be optimised
+                #   for ZODB there is no need to go through handler
+                #   as read write is protected by transactions
+                portal = getSite()
+                portal_annotations = IAnnotations(portal)
+                store = portal_annotations.get('gu.plone.rdf.store')
+                if store is None:
+                    store = portal_annotations['gu.plone.rdf.store'] = plugin.get('ZODB', plugin.Store)()
+                from ordf.handler import Handler
+                from ordf.handler.rdf import RDFLib
+                handler = Handler()
+                reader = RDFLib(store=store)
+                handler.reader = reader
+                reader.handler = handler
+                handler.register_reader(reader)
+                writer = RDFLib(store=store)
+                handler.writer = writer
+                writer.handler = handler
+                handler.register_writer(writer)
+                self.handler = handler
+            else:
+                self.handler = init_handler(config)
         return self.handler
 
     def getLocalStore(self):
@@ -95,7 +117,7 @@ class ORDFUtility(object):
             # proplabels = rdfhandler.query(PROPLABELQUERY)
             # for row in proplabels:
             #     formatgraph.add((row['p'], RDFS.label, row['l']))
-            # 
+            #
             #
             #    an alternative to deal with multiple data sources
             #    >>> unionGraph = ReadOnlyGraphAggregate([g1, g2])
