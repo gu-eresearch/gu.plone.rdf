@@ -64,5 +64,4 @@
         for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
              .interfaces.IDateRangeWidget" />
 
-
 </configure>
