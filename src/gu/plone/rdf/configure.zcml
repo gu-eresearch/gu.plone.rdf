@@ -64,9 +64,5 @@
         for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
              .interfaces.IDateRangeWidget" />
 
-<!-- <subscriber -->
-<!--     	for="..interfaces.IObjectInterface  -->
-<!--     			Products.Archetypes.interfaces.IObjectInitializedEvent" -->
-<!--         handler=".myobject.storeMyObject" /> ... fired when edit succeeded -->
 
 </configure>
