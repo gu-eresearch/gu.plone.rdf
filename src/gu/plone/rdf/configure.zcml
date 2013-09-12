@@ -22,7 +22,7 @@
   <adapter
       factory=".repositorymetadata.RepositoryMetadataAdapter"
       for="plone.uuid.interfaces.IUUIDAware"
-      provides="gu.repository.content.interfaces.IRepositoryMetadata"
+      provides="gu.z3cform.rdf.interfaces.IGraph"
       />
 
   <adapter
@@ -50,7 +50,7 @@
         factory=".vocabulary.LocalGraphVocabularyFactory"
         />
 
-<adapter
+    <adapter
         factory=".converter.SubformAdapter"
         />
 

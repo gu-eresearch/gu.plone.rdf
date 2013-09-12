@@ -1,7 +1,6 @@
 from zope.lifecycleevent.interfaces import IObjectAddedEvent, IObjectModifiedEvent, IObjectRemovedEvent
-from gu.repository.content.interfaces import IRepositoryMetadata
 from zope.component import getUtility
-from gu.z3cform.rdf.interfaces import IORDF
+from gu.z3cform.rdf.interfaces import IORDF, IGraph
 from rdflib import RDF, OWL
 from zope.component import getUtilitiesFor
 from gu.plone.rdf.interfaces import IRDFContentTransform
@@ -43,7 +42,7 @@ def InitialiseGraph(object, event):
     if isTemporaryItem(object):
         LOG.info("skip added temporary item: %s", repr(object))
         return
-    graph = IRepositoryMetadata(object)
+    graph = IGraph(object)
     LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
     # lookup all transform utilities and call them
     transformers = getUtilitiesFor(IRDFContentTransform)
@@ -60,7 +59,7 @@ def ModifyGraph(object, event):
     # FIXME: might need to update other graph triples here too :) ... e.g. map plone dc fields to graph fields
     # FIXME: use transformers here too?
     LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
-    graph = IRepositoryMetadata(object)
+    graph = IGraph(object)
     LOG.info("Got %d triples for item %s", len(graph), graph.identifier)
     transformers = getUtilitiesFor(IRDFContentTransform)
     for transname, transtool in transformers:
@@ -77,7 +76,7 @@ def RemoveGraph(object, event):
     #       2. remove all relations pointing from here
     #       3. remove all relations pointing to here (might be hard to do for )
     try:
-        graph = IRepositoryMetadata(object)
+        graph = IGraph(object)
     except TypeError:
         # object doesn't have right interface, so ignore
         return

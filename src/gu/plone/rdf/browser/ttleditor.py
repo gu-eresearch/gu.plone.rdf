@@ -2,12 +2,12 @@ from plone.directives import form
 from zope import schema
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from z3c.form import button
-from gu.z3cform.rdf.interfaces import IORDF
+from gu.z3cform.rdf.interfaces import IORDF, IGraph
 from rdflib import URIRef
 from zope.component import getUtility
 from Products.statusmessages.interfaces import IStatusMessage
 from ordf.graph import Graph
-from gu.repository.content.interfaces import IRepositoryMetadata
+
 
 # TODO: make this form work on a context :)
 #       -> allow to browse to related items ... e.g. render a list of outgoing links to edit
@@ -23,7 +23,7 @@ class ITTLEditor(form.Schema):
     ttl = schema.Text(title=u"Data",
                       required=False)
 
-    
+
 class TTLEditForm(form.SchemaForm):
 
     ignoreContext = True
@@ -36,7 +36,7 @@ class TTLEditForm(form.SchemaForm):
     def update(self):
         super(form.SchemaForm, self).update()
         try:
-            g = IRepositoryMetadata(self.context)
+            g = IGraph(self.context)
             self.widgets['ttl'].value = g.serialize(format='turtle')
             self.widgets['ttl'].rows = 20
             term = self.widgets['graph'].terms.getTerm(g.identifier)
@@ -47,9 +47,7 @@ class TTLEditForm(form.SchemaForm):
             msg = u"can't load current context: %s" % str(e)
             msg_type = 'error'
             self.request.response.setStatus(status=400, reason='Import failed')
-            IStatusMessage(self.request).add(msg, type=msg_type)    
-        
-        
+            IStatusMessage(self.request).add(msg, type=msg_type)
 
     @button.buttonAndHandler(u'Fetch')
     def handleFetch(self, action):
