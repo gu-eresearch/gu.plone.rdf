@@ -35,6 +35,6 @@
       permission="cmf.ManagePortal" />
 
   <adapter
-      factory=".behavior.RDFFormExtender"/>
+      factory=".formextender.RDFFormExtender"/>
 
 </configure>
