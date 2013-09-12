@@ -83,6 +83,9 @@ def RemoveGraph(object, event):
         return
     # Note: just remove the graph. In theory it can be reconstructed by all the changesets that refer to it.
     handler = getUtility(IORDF).getHandler()
+    # FIXME: happens when we remove the site
+    # if handler is None:
+    #     return
     handler.remove(graph)
     # 2. query all triples where graph.identifier is object and clear those too
     #    -> generates changeset
