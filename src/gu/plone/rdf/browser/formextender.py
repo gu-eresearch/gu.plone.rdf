@@ -51,6 +51,7 @@ class RDFFormExtender(FormExtender):
         lens = getLens(individual)
         LOG.info('individual types: %s', individual.type)
         LOG.info('picked lens: %s', lens)
+        groups = fields = ()
         if lens is not None:
             groups, fields = getFieldsFromFresnelLens(lens, individual.graph,
                                                       individual.identifier)
