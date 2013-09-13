@@ -4,8 +4,8 @@ from zope.component import adapter
 from plone.z3cform.fieldsets.extensible import FormExtender
 from plone.app.z3cform.interfaces import IPloneFormLayer
 from gu.z3cform.rdf.interfaces import IIndividual, IGraph
-from gu.z3cform.rdf.fresnel.edit import getLens
-from gu.z3cform.rdf.fresnel.edit import getFieldsFromFresnelLens
+from gu.z3cform.rdf.fresnel import getLens
+from gu.z3cform.rdf.fresnel import getFieldsFromFresnelLens
 
 LOG = logging.getLogger(__name__)
 
