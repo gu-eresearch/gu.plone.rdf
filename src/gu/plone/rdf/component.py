@@ -87,6 +87,7 @@ class ORDFUtility(object):
                 handler.writer = writer
                 writer.handler = handler
                 handler.register_writer(writer)
+                return handler
                 self.handler = handler
             else:
                 self.handler = init_handler(config)
