@@ -156,7 +156,7 @@ class ORDFUtility(object):
         settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
         return settings.get('baseuri')
 
-    def genereateURI(self):
+    def generateURI(self):
         """ generate a new unique uri using base uri """
         contenturi = "{}{}".format(self.getBaseURI(), uuid.uuid1())
         return URIRef(contenturi)
