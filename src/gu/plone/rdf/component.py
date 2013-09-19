@@ -15,6 +15,8 @@ from gu.z3cform.rdf.fresnel.fresnel import Fresnel
 from gu.z3cform.rdf.interfaces import IORDF
 from gu.plone.rdf.interfaces import IRDFSettings
 from rdflib import plugin, URIRef
+import uuid
+
 
 LOG = logging.getLogger(__name__)
 
@@ -148,3 +150,13 @@ class ORDFUtility(object):
     def clearCache(self):
         # TODO: update all other instances too ... maybe store fresnel in memcached?
         self.fresnel = None
+
+    def getBaseURI(self):
+        """ return the base uri to be used for all content """
+        settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
+        return settings.get('baseuri')
+
+    def genereateURI(self):
+        """ generate a new unique uri using base uri """
+        contenturi = "{}{}".format(self.getBaseURI(), uuid.uuid1())
+        return URIRef(contenturi)
