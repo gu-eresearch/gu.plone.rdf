@@ -51,10 +51,6 @@
         />
 
     <adapter
-        factory=".converter.SubformAdapter"
-        />
-
-    <adapter
         factory=".converter.RDFDateDataConverter"
         for="gu.z3cform.rdf.interfaces.IRDFDateField
              collective.z3cform.datetimewidget.interfaces.IDateWidget" />

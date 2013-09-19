@@ -34,7 +34,4 @@
       class=".ttleditor.TTLEditForm"
       permission="cmf.ManagePortal" />
 
-  <adapter
-      factory=".formextender.RDFFormExtender"/>
-
 </configure>
