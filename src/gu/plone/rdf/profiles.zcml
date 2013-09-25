@@ -18,6 +18,13 @@
       description=""
       handler="gu.plone.rdf.setuphandlers.import_various" />
 
+  <gs:importStep
+      name="gu.plone.rdf.ontologies"
+      title="Import ontologies into local triple store"
+      description=""
+      handler="gu.plone.rdf.exportimport.importLocalRDF" />
+
+
   <!-- Register the upgrade step -->
   <!-- <gs:upgradeStep -->
   <!--     title="Upgrade rabbitmq settings" -->
