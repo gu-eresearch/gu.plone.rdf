@@ -7,6 +7,9 @@ from datetime import date
 import zope.interface
 import zope.component
 from isodate import parse_date
+import re
+
+splitdate = re.compile(r'^(\d\d\d\d)(-(\d\d))?(-(\d\d))?$').match
 
 
 class RDFDateDataConverter(BaseDataConverter):
@@ -20,23 +23,23 @@ class RDFDateDataConverter(BaseDataConverter):
     def toWidgetValue(self, value):
         if value is self.field.missing_value:
             return ('', '', '')
-        value = value.toPython()
-        return (value.year, value.month, value.day)
+        parts = splitdate(value)
+        if parts:
+            return (parts.group(1), parts.group(3) or '', parts.group(5) or '')
+        return ('', '', '')
 
     def toFieldValue(self, value):
+        found_none = False
         for val in value:
             if not val:
-                return self.field.missing_value
-
-        try:
-            value = map(int, value)
-        except ValueError:
-            raise DateValidationError
-        try:
-            value = date(*value)
-        except ValueError:
-            raise DateValidationError
-        return Literal(value, datatype=XSD['date'])
+                found_none = True
+            elif found_none:
+                # We had an essential value skippd. e.g. no month, but date was given.
+                # TODO: better error message please
+                raise ValueError('Skipped wrong element of date values.')
+        # TODO: could validate here and throw ValidationError as well
+        value = ['{:0>2s}'.format(v) for v in filter(bool, value)]
+        return Literal(u'-'.join(value), datatype=DC['W3CDTF'])
 
 
 class RDFDateRangeConverter(BaseDataConverter):

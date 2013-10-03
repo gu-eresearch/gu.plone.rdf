@@ -2,6 +2,7 @@
 <configure
      xmlns="http://namespaces.zope.org/zope"
      xmlns:browser="http://namespaces.zope.org/browser"
+     xmlns:zcml="http://namespaces.zope.org/zcml"
      i18n_domain="gu.ordf">
 
   <!-- Include dependencies' configuration -->
@@ -64,10 +65,32 @@
         factory=".vocabulary.LocalGraphVocabularyFactory"
         />
 
-    <adapter
-        factory=".converter.RDFDateDataConverter"
-        for="gu.z3cform.rdf.interfaces.IRDFDateField
-             collective.z3cform.datetimewidget.interfaces.IDateWidget" />
+
+    <configure zcml:condition="installed collective.z3cform.datetimewidget">
+
+      <class class="gu.z3cform.rdf.schema.RDFDateField">
+        <implements interface="collective.z3cform.datetimewidget.interfaces.IDateField"/>
+      </class>
+
+      <adapter
+          factory=".converter.RDFDateDataConverter"
+          for="gu.z3cform.rdf.interfaces.IRDFDateField
+               collective.z3cform.datetimewidget.interfaces.IDateWidget" />
+
+    </configure>
+
+    <configure zcml:condition="installed plone.formwidget.datetime">
+
+      <class class="gu.z3cform.rdf.schema.RDFDateField">
+        <implements interface="plone.formwidget.datetime.interfaces.IDateField"/>
+      </class>
+
+      <adapter factory="converter.RDFDateDataConverter"
+               for="gu.z3cform.rdf.interfaces.IRDFDateField
+                    plone.formwidget.datetime.interfaces.IDateWidget"/>
+
+    </configure>
+
 
     <adapter
         factory=".converter.RDFDateRangeConverter"
