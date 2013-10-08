@@ -4,7 +4,11 @@
                          class view/klass;">
         <span tal:content="view/widgets/start/label"></span>
         <tal:replace tal:content="structure view/widgets/start/render"></tal:replace>
+        <span tal:content="view/widgets/starttext/label"></span>
+        <tal:replace tal:content="structure view/widgets/starttext/render"></tal:replace>
         <span tal:content="view/widgets/end/label"></span>
         <tal:replace tal:content="structure view/widgets/end/render"></tal:replace>
+        <span tal:content="view/widgets/endtext/label"></span>
+        <tal:replace tal:content="structure view/widgets/endtext/render"></tal:replace>
     </div>
 </tal:root>
