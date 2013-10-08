@@ -91,10 +91,16 @@
 
     </configure>
 
+    <adapter
+        factory=".converter.RDFDateDataConverter"
+        for="gu.z3cform.rdf.interfaces.IRDFDateField
+             .interfaces.IDateWidget" />
 
     <adapter
         factory=".converter.RDFDateRangeConverter"
         for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
              .interfaces.IDateRangeWidget" />
+
+
 
 </configure>

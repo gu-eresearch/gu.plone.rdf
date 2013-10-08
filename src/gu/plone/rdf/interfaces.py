@@ -37,9 +37,14 @@ class IRDFContentTransform(Interface):
         add tew triples to graph based on given content
         """
 
-    
+
+class IDateWidget(IWidget):
+    """ Date widget. """
+
+
 class IDateRangeWidget(IWidget):
     """ Date range widget. """
+
 
 class IDiscoverFacetWidget(IWidget):
     """ Used to render facet search links. """

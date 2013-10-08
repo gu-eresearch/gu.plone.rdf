@@ -1,35 +1,71 @@
-from collective.z3cform.datetimewidget import DateWidget as BaseDateWidget
-import zope.component
-import zope.interface
-import zope.schema.interfaces
-import z3c.form.interfaces
-import z3c.form.widget
+from zope.component import adapter
+from zope.interface import implementer
+#from zope.schema.interfaces import IField
+from gu.z3cform.rdf.interfaces import IRDFDateField
+from z3c.form.interfaces import IFormLayer, IFieldWidget, NO_VALUE
+from z3c.form.widget import Widget, FieldWidget
+from z3c.form.browser.widget import HTMLTextInputWidget, addFieldClass
+from gu.plone.rdf.interfaces import IDateWidget
 
 
-class DateWidget(BaseDateWidget):
+@implementer(IDateWidget)
+class DateWidget(HTMLTextInputWidget, Widget):
 
-    # TODO: try to find a way to set parameters like below in RDF
+    klass = u'date-widget'
+    value = ('', '', '')
 
-    show_today_link = True
-    show_jquerytools_dateinput = True
+    @property
+    def year(self):
+        year = self.request.get(self.name + '-year', None)
+        if year is not None:
+            return year
+        return self.value[0]
 
-    # @property
-    # def formatted_value(self):
-    #     try:
-    #         date_value = date(*map(int, self.value))
-    #     except ValueError:
-    #         return ''
-    #     formatter = self.request.locale.dates.getFormatter("date", "short")
-    #     if date_value.year > 1900:
-    #         return formatter.format(date_value)
-    #     # due to fantastic datetime.strftime we need this hack
-    #     # for now ctime is default
-    #     return date_value.ctime()
+    @property
+    def month(self):
+        month = self.request.get(self.name + '-month', None)
+        if month:
+            return month
+        return self.value[1]
+
+    @property
+    def day(self):
+        day = self.request.get(self.name + '-day', None)
+        if day is not None:
+            return day
+        return self.value[2]
+
+    @property
+    def hidden_value(self):
+        return '/'.join(self.value)
+
+    @property
+    def formatted_value(self):
+        return '/'.join(self.value)
+
+    def update(self):
+        super(DateWidget, self).update()
+        addFieldClass(self)
+
+    def extract(self, default=NO_VALUE):
+        # get normal input fields
+        day = self.request.get(self.name + '-day', default)
+        month = self.request.get(self.name + '-month', default)
+        year = self.request.get(self.name + '-year', default)
+
+        if not default in (year, month, day):
+            return (year, month, day)
+
+        # get a hidden value
+        hidden_date = self.request.get(self.name, '')
+        hidden_date = hidden_date.split("/")
+        if len(hidden_date) == 3:
+            return hidden_date
+        return default
 
 
-@zope.component.adapter(zope.schema.interfaces.IField,
-                        z3c.form.interfaces.IFormLayer)
-@zope.interface.implementer(z3c.form.interfaces.IFieldWidget)
+@adapter(IRDFDateField, IFormLayer)
+@implementer(IFieldWidget)
 def DateFieldWidget(field, request):
     """IFieldWidget factory for DateWidget."""
-    return z3c.form.widget.FieldWidget(field, DateWidget(request))
+    return FieldWidget(field, DateWidget(request))
