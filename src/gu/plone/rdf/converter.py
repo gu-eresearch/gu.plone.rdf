@@ -1,12 +1,11 @@
 # maybe use own exceptions here?
 from collective.z3cform.datetimewidget.interfaces import DateValidationError
 from gu.z3cform.rdf.converter import BaseDataConverter
+from gu.z3cform.rdf.utils import Period
 from rdflib import Literal
 from ordf.namespace import XSD, DC
-from datetime import date
 import zope.interface
 import zope.component
-from isodate import parse_date
 import re
 
 splitdate = re.compile(r'^(\d\d\d\d)(-(\d\d))?(-(\d\d))?$').match
@@ -39,6 +38,8 @@ class RDFDateDataConverter(BaseDataConverter):
                 raise ValueError('Skipped wrong element of date values.')
         # TODO: could validate here and throw ValidationError as well
         value = ['{:0>2s}'.format(v) for v in filter(bool, value)]
+        if not value:
+            return self.field.missing_value
         return Literal(u'-'.join(value), datatype=DC['W3CDTF'])
 
 
@@ -46,90 +47,59 @@ class RDFDateRangeConverter(BaseDataConverter):
 
     def toWidgetValue(self, value):
         ret = {'start': ('', '', ''),
-               'end': ('', '', '')}
+               'end': ('', '', ''),
+               'starttext': '',
+               'endtext': ''}
         if value is self.field.missing_value:
             return ret
         # TODO: check literal datatype?
         period = Period(value)
         # TODO: check encoding scheme in case of period
-        if period.start:
-            start = parse_date(period.start)
-            ret['start'] = (start.year, start.month, start.day)
-        if period.end:
-            end = parse_date(period.end)
-            ret['end'] = (end.year, end.month, end.day)
+        if period.scheme in (None, 'W3C-DTF'):
+            if period.start:
+                start = splitdate(period.start)
+                if start:
+                    ret['start'] = (start.group(1), start.group(3) or '', start.group(5) or '')
+            if period.end:
+                end = splitdate(period.end)
+                if end:
+                    ret['end'] = (end.group(1), end.group(3) or '', end.group(5) or '')
+        else:
+            if period.start:
+                ret['starttext'] = period.start
+            if period.end:
+                ret['endtext'] = period.end
         return ret
 
+    def _check_date_bits(self, value):
+        found_none = False
+        for val in value:
+            if not val:
+                found_none = True
+            elif found_none:
+                raise ValueError('Skipped wrong element of date values.')
+
     def toFieldValue(self, value):
-        for val in value['start']:
-            if not val:
-                return self.field.missing_value
-        for val in value['end']:
-            if not val:
-                return self.field.missing_value
-
-        try:
-            value = {'start': map(int, value['start']),
-                     'end': map(int, value['end'])}
-        except ValueError:
-            raise DateValidationError
-        try:
-            value = {'start': date(*value['start']),
-                     'end': date(*value['end'])}
-        except ValueError:
-            raise DateValidationError
-        # FIXEM: generate correct dcmi period here
-        litval = Period('')
-        litval.start = value['start'].isoformat()
-        litval.end = value['end'].isoformat()
-        litval.scheme = 'W3C-DTF'
-        return Literal(unicode(litval), datatype=DC['Period'])
-
-
-
-
-import re
-
-
-class Period(object):
-    """
-    Parse DCMI period strings and provide values as attributes.
-
-    Format set period values as valid DCMI period.
-
-    FIXME: currently uses date strings as is and does not try to interpret
-           them.
-           the same for formatting. date's have to be given as properly
-           formatted strings.
-    """
-
-    start = end = scheme = name = None
-
-    def __init__(self, str):
-        '''
-        TODO: assumes str is unicode
-        '''
-        sm = re.search(r'start=(.*?);', str)
-        if sm:
-            self.start = sm.group(1)
-        sm = re.search(r'scheme=(.*?);', str)
-        if sm:
-            self.scheme = sm.group(1)
-        sm = re.search(r'end=(.*?);', str)
-        if sm:
-            self.end = sm.group(1)
-        sm = re.search(r'name=(.*?);', str)
-        if sm:
-            self.name = sm.group(1)
-
-    def __unicode__(self):
-        parts = []
-        if self.start:
-            parts.append("start=%s;" % self.start)
-        if self.end:
-            parts.append("end=%s;" % self.end)
-        if self.name:
-            parts.append("name=%s;" % self.name)
-        if self.scheme:
-            parts.append("scheme=%s;" % self.scheme)
-        return u' '.join(parts)
+        # preference of text or date fields?
+        if ((any(value['start']) or any(value['end'])) and
+            (value['starttext'] or value['endtext'])):
+            raise DateValidationError("Please supply only date values or textual description.")
+        # check above sholud ensure we have either text or date values.
+        period = Period('')
+        if (value['starttext'] or value['endtext']):
+            # text dates
+            period.start = value['starttext']
+            period.end = value['endtext']
+            period.scheme = 'Textual description'
+        elif (any(value['start']) or any(value['end'])):
+            # date values
+            self._check_date_bits(value['start'])
+            self._check_date_bits(value['end'])
+            startvalue = ['{:0>2s}'.format(v) for v in filter(bool, value['start'])]
+            period.start = u'-'.join(startvalue)
+            endvalue = ['{:0>2s}'.format(v) for v in filter(bool, value['end'])]
+            period.end = u'-'.join(endvalue)
+            period.scheme = 'W3C-DTF'
+        else:
+            return self.field.missing_value
+        return Literal(unicode(period), datatype=DC['Period'])
