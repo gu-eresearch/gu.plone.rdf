@@ -13,12 +13,6 @@
 
   <!-- Register the import step -->
   <gs:importStep
-      name="gu.plone.rdf.catalog"
-      title="Plone RDF integration catalog setup"
-      description=""
-      handler="gu.plone.rdf.setuphandlers.import_various" />
-
-  <gs:importStep
       name="gu.plone.rdf.ontologies"
       title="Import ontologies into local triple store"
       description=""
