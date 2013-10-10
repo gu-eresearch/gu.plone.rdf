@@ -71,7 +71,7 @@ def reindex_catalog_import(context, logger=None):
     root = ET.fromstring(data)
 
     idx_ids = []
-    portal_catalog = getToolByName(context, 'portal_catalog')
+    portal_catalog = getToolByName(context.getSite(), 'portal_catalog')
     # parse a list of index names and reindex them
     for idxnode in root.findall('reindex'):
         idx_id = idxnode.get('name')
