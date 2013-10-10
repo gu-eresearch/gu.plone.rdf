@@ -2,6 +2,8 @@ import xml.etree.ElementTree as ET
 from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
 from ordf.graph import Graph, ConjunctiveGraph
+from Products.CMFCore.utils import getToolByName
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -49,3 +51,33 @@ def importLocalRDF(context):
             graph.parse(data=data, format='turtle')
             tool.getHandler().put(graph)
     tool.clearCache()
+
+
+def reindex_catalog_import(context, logger=None):
+    """Method to re-index various indices listed in reindex_catalog.xml
+
+    This is to be used as a GenericSetup importStep, which is setup to
+    depend on catalog importStep.
+
+    """
+    if logger is None:
+        # Called as upgrade step: define our own logger.
+        logger = logging.getLogger(__name__)
+
+    data = context.readDataFile('reindex_catalog.xml')
+    if not data:
+        return
+
+    root = ET.fromstring(data)
+
+    idx_ids = []
+    portal_catalog = getToolByName(context, 'portal_catalog')
+    # parse a list of index names and reindex them
+    for idxnode in root.findall('reindex'):
+        idx_id = idxnode.get('name')
+        if idx_id in portal_catalog.indexes():
+            idx_ids.append(idx_id)
+
+    if idx_ids:
+        logger.info("Re-indexing indexes %s.", ', '.join(idx_ids))
+        portal_catalog.manage_reindexIndex(ids=idx_ids)

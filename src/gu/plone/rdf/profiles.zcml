@@ -24,6 +24,14 @@
       description=""
       handler="gu.plone.rdf.exportimport.importLocalRDF" />
 
+  <gs:importStep
+      name="reindex_catalog"
+      title="Catalog re-index handler"
+      description="Re-index listed indexes in portal catalog on
+                   profile activation"
+      handler="gu.plone.rdf.exportimport.reindex_catalog_import">
+      <depends name="catalog"/>
+   </gs:importStep>
 
   <!-- Register the upgrade step -->
   <!-- <gs:upgradeStep -->
