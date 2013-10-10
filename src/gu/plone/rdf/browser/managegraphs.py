@@ -53,6 +53,7 @@ class IManageGraphs(form.Schema):  # Interface):
         vocabulary=SimpleVocabulary(
             [SimpleVocabulary.createTerm('auto', 'auto', u"Auto"),
              SimpleVocabulary.createTerm('n3', 'n3', u"N3"),
+             SimpleVocabulary.createTerm('turtle', 'turtle', u"Turtle"),
              SimpleVocabulary.createTerm('xml', 'xml', u"RDF/XML")]),
         required=True,
         default='auto',
@@ -63,7 +64,7 @@ class IManageGraphs(form.Schema):  # Interface):
         description=_(u"Please upload a file"),
         required=False,
         )
-    
+
     downloadurl = schema.URI(
         title=_(u"File URL"),
         description=_(u"RDF data location"),
@@ -168,7 +169,7 @@ class ManageGraphsForm(form.SchemaForm):
             self.request.response.redirect(self.request.getURL())
         IStatusMessage(self.request).add(msg, type=msg_type)
 
-        
+
     def updateActions(self):
         super(ManageGraphsForm, self).updateActions()
         #self.actions['clearfresnel'].addClass("context")
@@ -189,7 +190,7 @@ class ManageGraphsForm(form.SchemaForm):
             IStatusMessage(self.request).addStatusMessage(
                 _(u"Graph %s deleted." % g), "info")
         self.request.response.redirect(self.request.getURL())
-        
+
     # @button.buttonAndHandler(u'Clear Fresnel Cache', name="clearfresnel")
     # def handleClearFresnelCache(self, action):
     #     notify(FresnelLensesModifiedEvent())
@@ -233,6 +234,7 @@ class IManageLocalGraphs(form.Schema):  # Interface):
         vocabulary=SimpleVocabulary(
             [SimpleVocabulary.createTerm('auto', 'auto', u"Auto"),
              SimpleVocabulary.createTerm('n3', 'n3', u"N3"),
+             SimpleVocabulary.createTerm('turtle', 'turtle', u"Turtle"),
              SimpleVocabulary.createTerm('xml', 'xml', u"RDF/XML")]),
         required=True,
         default='auto',
@@ -243,7 +245,7 @@ class IManageLocalGraphs(form.Schema):  # Interface):
         description=_(u"Please upload a file"),
         required=False,
         )
-    
+
     downloadurl = schema.URI(
         title=_(u"File URL"),
         description=_(u"RDF data location"),
@@ -344,7 +346,7 @@ class ManageLocalGraphsForm(form.SchemaForm):
             self.request.response.redirect(self.request.getURL())
         IStatusMessage(self.request).add(msg, type=msg_type)
 
-        
+
     def updateActions(self):
         super(ManageLocalGraphsForm, self).updateActions()
         #self.actions['clearfresnel'].addClass("context")
@@ -367,7 +369,7 @@ class ManageLocalGraphsForm(form.SchemaForm):
             IStatusMessage(self.request).addStatusMessage(
                 _(u"Graph %s deleted." % g), "info")
         self.request.response.redirect(self.request.getURL())
-        
+
     # @button.buttonAndHandler(u'Clear Fresnel Cache', name="clearfresnel")
     # def handleClearFresnelCache(self, action):
     #     notify(FresnelLensesModifiedEvent())
