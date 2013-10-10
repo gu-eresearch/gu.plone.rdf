@@ -11,6 +11,7 @@ from gu.plone.rdf.interfaces import IRDFSettings
 # TODO:
 # -> value update events ...-> ORDFTool
 
+
 class RDFControlPanelForm(form.SchemaEditForm):
 
     control_panel_view = "plone_control_panel"
@@ -25,7 +26,6 @@ class RDFControlPanelForm(form.SchemaEditForm):
 
     def updateWidgets(self):
         super(RDFControlPanelForm, self).updateWidgets()
-        self.widgets['ordf_configuration'].rows = 20
 
     def updateActions(self):
         super(RDFControlPanelForm, self).updateActions()

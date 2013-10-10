@@ -1,5 +1,5 @@
 <registry>
   <records interface="gu.plone.rdf.interfaces.IRDFSettings">
-    <value key="fresnel_graph_uri">http://namespaces.griffith.edu.au/FRESNEL</value>
+    <value key="fresnel_graph_uri">http://namespaces.griffith.edu.au/fresnel#</value>
   </records>
 </registry>
