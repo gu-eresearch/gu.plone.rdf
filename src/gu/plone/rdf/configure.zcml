@@ -31,20 +31,6 @@
       name="subjecturi"
       />
 
-  <!-- plone.app.z3cform re-registers the z3c.form SubformAdapter to
-       a more specific request layer. So we have to make ours a bit
-       more specific as well -->
-  <adapter
-      factory="gu.z3cform.rdf.object.SubformAdapter"
-      for="zope.interface.Interface
-           plone.app.z3cform.interfaces.IPloneFormLayer
-           zope.interface.Interface
-           zope.interface.Interface
-           gu.z3cform.rdf.widgets.interfaces.IRDFObjectWidget
-           gu.z3cform.rdf.interfaces.IRDFObjectField
-           zope.interface.Interface"
-       />
-
   <subscriber
       for="plone.uuid.interfaces.IUUIDAware
            zope.lifecycleevent.IObjectAddedEvent"
@@ -100,6 +86,13 @@
         factory=".converter.RDFDateRangeConverter"
         for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
              .interfaces.IDateRangeWidget" />
+
+
+    <adapter
+        factory=".objectproperty.DexterityEditRDFObjectPropertySubformFactory"/>
+
+    <adapter
+        factory=".objectproperty.DexterityAddRDFObjectPropertySubformFactory"/>
 
 
 
