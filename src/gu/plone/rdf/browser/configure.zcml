@@ -34,4 +34,13 @@
       class=".ttleditor.TTLEditForm"
       permission="cmf.ManagePortal" />
 
+  <browser:viewlet
+      name="gu.plone.rdf.rdfviewlet"
+      for="plone.uuid.interfaces.IUUIDAware"
+      manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
+      template="metadataviewlet.pt"
+      class=".viewlet.ViewMetadataViewlet"
+      permission="zope2.View"
+      />
+
 </configure>
