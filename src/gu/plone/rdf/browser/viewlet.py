@@ -5,7 +5,7 @@ from plone.z3cform.fieldsets.extensible import ExtensibleForm
 from z3c.form import form
 from z3c.form.interfaces import DISPLAY_MODE, IFormLayer, IDisplayForm
 from zope.browserpage import ViewPageTemplateFile
-from zope.interface import alsoProvides
+from zope.interface import alsoProvides, implementer
 from Acquisition import aq_inner
 
 # starting from 0.6.0 version plone.z3cform has IWrappedForm interface
