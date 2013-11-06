@@ -20,8 +20,8 @@ setup(name='gu.plone.rdf',
       url='http://svn.plone.org/svn/collective/',
       license='GPL',
       packages=find_packages('src'),
-      package_dir={'':'src'},
-      namespace_packages=['gu', 'gu.plone' ],
+      package_dir={'': 'src'},
+      namespace_packages=['gu', 'gu.plone'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
@@ -31,7 +31,8 @@ setup(name='gu.plone.rdf',
           'gu.z3cform.rdf',
           'ordf',
           'rdflib-zodb',
-          'collective.z3cform.datetimewidget'
+          'collective.z3cform.datetimewidget',
+          'collective.monkeypatcher'
       ],
       extras_require={
           'test': ['plone.app.testing', ]

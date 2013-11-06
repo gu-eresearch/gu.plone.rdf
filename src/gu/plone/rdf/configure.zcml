@@ -3,6 +3,7 @@
      xmlns="http://namespaces.zope.org/zope"
      xmlns:browser="http://namespaces.zope.org/browser"
      xmlns:zcml="http://namespaces.zope.org/zcml"
+     xmlns:monkey="http://namespaces.plone.org/monkey"
      i18n_domain="gu.ordf">
 
   <!-- Include dependencies' configuration -->
@@ -94,6 +95,23 @@
     <adapter
         factory=".objectproperty.DexterityAddRDFObjectPropertySubformFactory"/>
 
+    <monkey:patch
+        description="Work around a bug in group handling in
+                     plone.z3cform Extensibleform"
+        module="plone.z3cform.fieldsets.utils"
+        original="add"
+        replacement=".patch.add"
+        preconditions="plone.z3cform-=0.8.0"
+        />
 
+    <monkey:patch
+        description="Patch group attribute on
+                     plone.z3cform.fieldsets.extensible.ExtensibleForm"
+        class="plone.z3cform.fieldsets.extensible.ExtensibleForm"
+        original="groups"
+        replacement=".patch.patchExtensibleForm"
+        handler=".patch.patchExtensibleForm"
+        preconditions="plone.z3cform-=0.8.0"
+        />
 
 </configure>
