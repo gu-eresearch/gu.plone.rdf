@@ -21,12 +21,14 @@ def RepositoryMetadataAdapter(context):
     except Exception as e:
         LOG.error('could not retrieve graph for %s, %s', contenturi, e)
     if graph is None:
-        LOG.info("generate empty graph for %s", contenturi)
+        #LOG.info("generate empty graph for %s", contenturi)
         graph = Graph(identifier=contenturi)
     else:
-        LOG.info('retrieved %d triples for %s', len(graph), graph.identifier)
+        #LOG.info('retrieved %d triples for %s', len(graph), graph.identifier)
+        pass
 
     return graph
+
 
 def getContentUri(context):
     #1. determine subject uri for context

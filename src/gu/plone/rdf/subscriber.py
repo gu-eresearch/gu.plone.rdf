@@ -43,34 +43,34 @@ def InitialiseGraph(object, event):
         LOG.info("skip added temporary item: %s", repr(object))
         return
     graph = IGraph(object)
-    LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
+    #LOG.info("Got %d triples for New item %s", len(graph), graph.identifier)
     # lookup all transform utilities and call them
     transformers = getUtilitiesFor(IRDFContentTransform)
     for transname, transtool in transformers:
         transtool.tordf(object, graph)
     handler = getUtility(IORDF).getHandler()
     # ... check for temporary folder...
-    LOG.info("Initialise new item %s at %s", repr(object), repr(event.newParent))
-    LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
+    #LOG.info("Initialise new item %s at %s", repr(object), repr(event.newParent))
+    #LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
     handler.put(graph)
 
 
 def ModifyGraph(object, event):
     # FIXME: might need to update other graph triples here too :) ... e.g. map plone dc fields to graph fields
     # FIXME: use transformers here too?
-    LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
+    #LOG.info("Item: %s has been edited: %s", repr(object), repr(event))
     graph = IGraph(object)
-    LOG.info("Got %d triples for item %s", len(graph), graph.identifier)
+    #LOG.info("Got %d triples for item %s", len(graph), graph.identifier)
     transformers = getUtilitiesFor(IRDFContentTransform)
     for transname, transtool in transformers:
         transtool.tordf(object, graph)
     handler = getUtility(IORDF).getHandler()
-    LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
+    #LOG.info("Posting %d triples for New item %s", len(graph), graph.identifier)
     handler.put(graph)
 
 
 def RemoveGraph(object, event):
-    LOG.info("Item: %s has been deleted: %s", repr(object), repr(event))
+    #LOG.info("Item: %s has been deleted: %s", repr(object), repr(event))
     # TODO: clean up removed triples ...
     #       1. remove Graph itself
     #       2. remove all relations pointing from here

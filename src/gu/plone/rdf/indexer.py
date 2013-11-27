@@ -10,6 +10,5 @@ def subjectURIIndexer(context):
     # do somechecking here, e.g. only do this if the mimetype is
     # suitable for indexing etc..
     contenturi = getContentUri(context)
-    LOG.info('Index subjecturi for %s' % contenturi)
+    #LOG.info('Index subjecturi for %s' % contenturi)
     return unicode(contenturi)
-
