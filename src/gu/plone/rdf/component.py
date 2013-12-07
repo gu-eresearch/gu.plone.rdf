@@ -1,7 +1,6 @@
 from App.config import getConfiguration
 import ConfigParser
 import logging
-from cStringIO import StringIO
 
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
@@ -20,7 +19,8 @@ import uuid
 
 LOG = logging.getLogger(__name__)
 
-PROPLABELQUERY =  """
+
+PROPLABELQUERY = """
 PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:<http://www.w3.org/2002/07/owl#>
@@ -46,6 +46,7 @@ WHERE {
 }
 """
 
+
 #### Utilites
 
 class ORDFUtility(object):
@@ -56,6 +57,14 @@ class ORDFUtility(object):
     # TODO: need to find a way to reset this even in a multi-ZEO client setup
     fresnel = None
     handler = None
+
+    def __init__(self):
+        # init handler so that all threads see the same handler
+        self.getHandler()
+        # TODO: this needs to become thread safe.
+        #       two threads might grab a handler or fresnel graph from here.
+        #       they would overwrite each others handler.
+        #       when re-getting a handler from here, the other thread might work with the wrong handler
 
     # TODO: check if it is ok to cache handler forever (e.g... connection to store not closed or unexpectedly closed on graph.glose()?)
     def getHandler(self):
