@@ -81,8 +81,9 @@ class ORDFUtility(object):
                 #   as read write is protected by transactions
                 portal = getSite()
                 # FIXME: happens when we remove the portal
-                # if portal is None:
-                #     return None
+                #        and during test setup
+                if portal is None:
+                    return None
                 portal_annotations = IAnnotations(portal)
                 store = portal_annotations.get('gu.plone.rdf.store')
                 if store is None:
