@@ -41,7 +41,7 @@ class DateWidget(HTMLTextInputWidget, Widget):
 
     @property
     def formatted_value(self):
-        return '/'.join(self.value)
+        return '/'.join(filter(None, self.value))
 
     def update(self):
         super(DateWidget, self).update()
