@@ -69,13 +69,19 @@ class ORDFUtility(object):
     # TODO: check if it is ok to cache handler forever (e.g... connection to store not closed or unexpectedly closed on graph.glose()?)
     def getHandler(self):
         if self.handler is None:
-            zconfig = getConfiguration()
-            zconfig = zconfig.product_config.get('gu.plone.rdf', dict())
-            ordfini = zconfig.get('inifile')
-            cp = ConfigParser.SafeConfigParser()
-            cp.read(ordfini)
-            config = dict(cp.items('ordf'))
-            if config.get('rdflib.store', None) ==  'ZODB':
+            try:
+                zconfig = getConfiguration()
+                zconfig = zconfig.product_config.get('gu.plone.rdf', dict())
+                ordfini = zconfig.get('inifile')
+                cp = ConfigParser.SafeConfigParser()
+                cp.read(ordfini)
+                config = dict(cp.items('ordf'))
+            except Exception as e:
+                # FIXME: be specific about exceptions
+                config = {'rdflib.store': 'ZODB'}
+                LOG.warn("No valid product configuration found: using "
+                         "default ZODB store (%s)", e)
+            if config.get('rdflib.store', None) == 'ZODB':
                 # TODO: this here could be optimised
                 #   for ZODB there is no need to go through handler
                 #   as read write is protected by transactions

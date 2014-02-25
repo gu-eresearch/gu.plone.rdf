@@ -51,7 +51,13 @@ def getContentUri(context):
     #url = base_uri + /@@redirect-to-uuid/<uuid>
     #uri = context.subjecturi
 
-    settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
-
-    contenturi = "%s%s" % (settings.get('baseuri'), uuid)
+    # FIXME: shouldn't consult config here, IORDF does this.
+    try:
+        settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
+        baseuri = settings['baseuri']
+    except Exception as e:
+        # FIXME: be specific about exceptions
+        baseuri = 'urn:plone:'
+        LOG.warn("No baseuri configured: using %s (%s)", baseuri, e)
+    contenturi = "%s%s" % (baseuri, uuid)
     return contenturi
