@@ -6,9 +6,14 @@ from rdflib import Literal
 from ordf.namespace import XSD, DC
 import zope.interface
 import zope.component
+from zope.schema import ValidationError
 import re
 
 splitdate = re.compile(r'^(\d\d\d\d)(-(\d\d))?(-(\d\d))?$').match
+
+
+class DateRangeValidationError(ValidationError):
+    __doc__ = u'Please supply either date values or textual description.'
 
 
 class RDFDateDataConverter(BaseDataConverter):
@@ -83,7 +88,7 @@ class RDFDateRangeConverter(BaseDataConverter):
         # preference of text or date fields?
         if ((any(value['start']) or any(value['end'])) and
             (value['starttext'] or value['endtext'])):
-            raise DateValidationError("Please supply only date values or textual description.")
+            raise DateRangeValidationError
         # check above sholud ensure we have either text or date values.
         period = Period('')
         if (value['starttext'] or value['endtext']):
