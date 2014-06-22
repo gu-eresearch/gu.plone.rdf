@@ -17,9 +17,6 @@
   <utility
       factory=".component.ORDFUtility" />
 
-  <browser:resourceDirectory
-        directory="static" name="gu.plone.rdf" />
-
   <!-- everything that has an UUID can have RDF metadata attached to it -->
   <adapter
       factory=".adapter.graph_for_content"
