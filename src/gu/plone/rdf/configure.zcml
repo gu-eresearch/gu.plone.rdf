@@ -20,11 +20,17 @@
   <browser:resourceDirectory
         directory="static" name="gu.plone.rdf" />
 
-  <!-- everything that has an UUID can have Metadata attached to it -->
+  <!-- everything that has an UUID can have RDF metadata attached to it -->
   <adapter
-      factory=".repositorymetadata.RepositoryMetadataAdapter"
+      factory=".adapter.graph_for_content"
       for="plone.uuid.interfaces.IUUIDAware"
       provides="gu.z3cform.rdf.interfaces.IGraph"
+      />
+
+  <adapter
+      factory=".adapter.resource_for_content"
+      for="plone.uuid.interfaces.IUUIDAware"
+      provides="gu.z3cform.rdf.interfaces.IResource"
       />
 
   <adapter

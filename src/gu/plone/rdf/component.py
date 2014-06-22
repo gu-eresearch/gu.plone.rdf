@@ -176,3 +176,36 @@ class ORDFUtility(object):
         """ generate a new unique uri using base uri """
         contenturi = "{}{}".format(self.getBaseURI(), uuid.uuid1())
         return URIRef(contenturi)
+
+    def getContentUri(self, context):
+        #1. determine subject uri for context
+        # FIXME: use property, attribute, context absolute url
+
+        context = aq_base(context)
+        uuid = IUUID(context, None)
+        if uuid is None:
+            # we probably deal with a new contet object that does not have an
+            # uuid yet let's generate one
+            from plone.uuid.interfaces import IMutableUUID, IUUIDGenerator
+            generator = queryUtility(IUUIDGenerator)
+            if generator is None:
+                return  # TODO: raise error
+            uuid = generator()
+            if not uuid:
+                return  # TODO: raise error
+            IMutableUUID(context).set(uuid)
+
+        #url = base_uri + /@@redirect-to-uuid/<uuid>
+        #uri = context.subjecturi
+
+        # FIXME: shouldn't consult config here, IORDF does this.
+        try:
+            settings = getConfiguration().product_config.get('gu.plone.rdf', dict())
+            baseuri = settings['baseuri']
+        except Exception as e:
+            # FIXME: be specific about exceptions
+            baseuri = 'urn:plone:'
+            LOG.warn("No baseuri configured: using %s (%s)", baseuri, e)
+        contenturi = "%s%s" % (baseuri, uuid)
+        return contenturi
+
