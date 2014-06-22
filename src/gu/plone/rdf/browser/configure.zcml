@@ -4,12 +4,6 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="gu.plone.rdf">
 
-  <browser:page
-      for="plone.app.layout.navigation.interfaces.INavigationRoot"
-      name="plone_rdf_settings"
-      class=".ordfsettings.RDFControlPanelForm"
-      permission="cmf.ManagePortal" />
-
   <browser:resourceDirectory
         directory="static" name="gu.plone.rdf" />
 

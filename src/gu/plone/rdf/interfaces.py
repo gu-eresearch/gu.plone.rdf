@@ -1,17 +1,5 @@
-from zope import schema
 from z3c.form.interfaces import IWidget
 from zope.interface import Interface
-from gu.plone.rdf import _
-
-
-class IRDFSettings(Interface):
-    """
-    Describe settings interface for ORDF-Setup
-    """
-    fresnel_graph_uri = schema.URI(
-        title=_(u"Fresnel Graph URI"),
-        required=True
-        )
 
 
 class IRDFContentTransform(Interface):

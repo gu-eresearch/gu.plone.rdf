@@ -13,11 +13,6 @@
   <div class="documentEditable">
     <div id="edit-bar">
       <ul class="contentViews" id="content-views">
-        <li>
-          <a href=""
-             tal:attributes="href string:$portal_url/@@plone_rdf_settings"
-             i18n:translate="label_users">Settings</a>
-        </li>
         <li class="selected">
           <a href=""
              tal:attributes="href string:$portal_url/@@plone_rdf_managegraphs"
