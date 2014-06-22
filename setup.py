@@ -3,7 +3,7 @@
 
 from setuptools import setup, find_packages
 
-version = '2.5.0-dev'
+version = '2.5.0'
 
 setup(
     name='gu.plone.rdf',
@@ -31,7 +31,7 @@ setup(
         'setuptools',
         'Products.CMFPlone',
         'plone.app.registry',
-        'gu.z3cform.rdf',
+        'gu.z3cform.rdf >= 0.8.0',
         'ordf',
         'rdflib-zodb',
         'collective.z3cform.datetimewidget',
