@@ -2,19 +2,16 @@ from App.config import getConfiguration
 import ConfigParser
 import logging
 
-from plone.registry.interfaces import IRegistry
-from zope.component import getUtility
 from zope.interface import implements
 from zope.component.hooks import getSite
 from zope.annotation.interfaces import IAnnotations
-
+from zope.component import queryUtility
 from ordf.handler import init_handler
-from gu.z3cform.rdf.fresnel.fresnel import Fresnel
-#from org.ausnc.rdf.interfaces import IFresnelLensesModified
 from gu.z3cform.rdf.interfaces import IORDF
-from gu.plone.rdf.interfaces import IRDFSettings
 from rdflib import plugin, URIRef
 import uuid
+from Acquisition import aq_base
+from plone.uuid.interfaces import IUUID
 
 
 LOG = logging.getLogger(__name__)
@@ -50,19 +47,16 @@ WHERE {
 #### Utilites
 
 class ORDFUtility(object):
-    # TODO: rethink this utility, and maybe make it easier to fetch content, or fresnel lenses based on context / browser layer.
-    #       e.g. make this utility the central API entry point
+
     implements(IORDF)
 
-    # TODO: need to find a way to reset this even in a multi-ZEO client setup
-    fresnel = None
     handler = None
 
     def __init__(self):
         # init handler so that all threads see the same handler
         self.getHandler()
         # TODO: this needs to become thread safe.
-        #       two threads might grab a handler or fresnel graph from here.
+        #       two threads might grab a handler
         #       they would overwrite each others handler.
         #       when re-getting a handler from here, the other thread might work with the wrong handler
 
@@ -78,6 +72,7 @@ class ORDFUtility(object):
                 config = dict(cp.items('ordf'))
             except Exception as e:
                 # FIXME: be specific about exceptions
+                #   e.g.: AttributeError('product_config',) ... happens during test
                 config = {'rdflib.store': 'ZODB'}
                 LOG.warn("No valid product configuration found: using "
                          "default ZODB store (%s)", e)
@@ -96,6 +91,7 @@ class ORDFUtility(object):
                     store = portal_annotations['gu.plone.rdf.store'] = plugin.get('ZODB', plugin.Store)()
                 from ordf.handler import Handler
                 from ordf.handler.rdf import RDFLib
+                # For testing we use ZODB storage, let Zope transaction manager manage this
                 handler = Handler()
                 reader = RDFLib(store=store)
                 handler.reader = reader
@@ -110,62 +106,6 @@ class ORDFUtility(object):
             else:
                 self.handler = init_handler(config)
         return self.handler
-
-    def getLocalStore(self):
-        portal = getSite()
-        # next step could be necessary
-        # portal = getToolByName(portal, 'portal_url').getPortalObject()
-        portal_annotations = IAnnotations(portal)
-        store = portal_annotations.get('gu.plone.rdf')
-        if store is None:
-            store = portal_annotations['gu.plone.rdf'] = plugin.get('ZODB', plugin.Store)()
-        return store
-
-    def getFresnel(self):
-        if self.fresnel is None:
-            LOG.info("reading fresnel graph from triple store")
-            #rdfhandler = self.getHandler()
-            registry = getUtility(IRegistry)
-            settings = registry.forInterface(IRDFSettings, check=False)
-            formatgraphuri = URIRef(settings.fresnel_graph_uri)
-            store = self.getLocalStore()
-            # TODO: make it optional to store application data in ZODB or external triple store
-            formatgraph = Fresnel(store=store,
-                                  identifier=formatgraphuri)
-            LOG.info("compiling fresnel graph")
-            formatgraph.compile()
-
-            # TODO: maybe cache property labels from external store in formatgraph
-            # proplabels = rdfhandler.query(PROPLABELQUERY)
-            # for row in proplabels:
-            #     formatgraph.add((row['p'], RDFS.label, row['l']))
-            #
-            #
-            #    an alternative to deal with multiple data sources
-            #    >>> unionGraph = ReadOnlyGraphAggregate([g1, g2])
-            #    >>> uniqueGraphNames = set(
-            #    ...     [graph.identifier for s, p, o, graph in unionGraph.quads(
-            #    ...     (None, RDF.predicate, None))])
-            #    >>> len(uniqueGraphNames)
-
-            # FIXME: compiled graph is cached until restart of instance
-            self.fresnel = formatgraph
-        return self.fresnel
-
-    def getURI(self, context, request=None):
-        # TODO: implement this:
-        #       check request for parameters / uri elements and look at content to determine URI
-        #       for rdf-graph.
-        raise NotImplementedError()
-
-    def getGraph(self, context, request=None):
-        # TODO: implement this:
-        #       fetch graph with current handler and return it.
-        raise NotImplementedError()
-
-    def clearCache(self):
-        # TODO: update all other instances too ... maybe store fresnel in memcached?
-        self.fresnel = None
 
     def getBaseURI(self):
         """ return the base uri to be used for all content """

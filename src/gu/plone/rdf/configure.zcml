@@ -50,12 +50,6 @@
            zope.lifecycleevent.IObjectRemovedEvent"
       handler=".subscriber.RemoveGraph" />
 
-    <utility
-        name="gu.plone.rdf.LocalGraphVocabulary"
-        factory=".vocabulary.LocalGraphVocabularyFactory"
-        />
-
-
     <configure zcml:condition="installed collective.z3cform.datetimewidget">
 
       <class class="gu.z3cform.rdf.schema.RDFDateField">
@@ -90,31 +84,5 @@
         factory=".converter.RDFDateRangeConverter"
         for="gu.z3cform.rdf.interfaces.IRDFDateRangeField
              .interfaces.IDateRangeWidget" />
-
-
-    <adapter
-        factory=".objectproperty.DexterityEditRDFObjectPropertySubformFactory"/>
-
-    <adapter
-        factory=".objectproperty.DexterityAddRDFObjectPropertySubformFactory"/>
-
-    <monkey:patch
-        description="Work around a bug in group handling in
-                     plone.z3cform Extensibleform"
-        module="plone.z3cform.fieldsets.utils"
-        original="add"
-        replacement=".patch.add"
-        preconditions="plone.z3cform-=0.8.0"
-        />
-
-    <monkey:patch
-        description="Patch group attribute on
-                     plone.z3cform.fieldsets.extensible.ExtensibleForm"
-        class="plone.z3cform.fieldsets.extensible.ExtensibleForm"
-        original="groups"
-        replacement=".patch.patchExtensibleForm"
-        handler=".patch.patchExtensibleForm"
-        preconditions="plone.z3cform-=0.8.0"
-        />
 
 </configure>

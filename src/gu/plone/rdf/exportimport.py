@@ -1,17 +1,21 @@
 import xml.etree.ElementTree as ET
 from zope.component import getUtility
 from gu.z3cform.rdf.interfaces import IORDF
-from ordf.graph import Graph, ConjunctiveGraph
+from ordf.graph import Graph
 from Products.CMFCore.utils import getToolByName
 
 
 import logging
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 # TODO: create export step as well
 
 
 def importLocalRDF(context):
+    # FIXME: there is no internal store at the moment.
+    #        maybe we can do something like import to named store
+    #        or just let IORDF tool decide where to store it?
+
     # TODO: allow to replace / add
     #       clear whole store
     #       clear single graphs
@@ -19,19 +23,20 @@ def importLocalRDF(context):
 
     xml = context.readDataFile('ontologies.xml')
     if xml is None:
-        logger.debug('Nothing to import.')
+        LOG.debug('Nothing to import.')
         return
 
-    logger.info('Import RDF data into local triple store')
+    LOG.info('Import RDF data into local triple store')
     root = ET.fromstring(xml)
 
     tool = getUtility(IORDF)
-    store = tool.getLocalStore()
-    local = ConjunctiveGraph(store=store)
 
     for node in root:
         if node.tag not in('local', 'external'):
             raise ValueError('Unknown node: {}'.format(node.tag))
+        if node.tag in ('local',):
+            LOG.warn("Import to local store no longer supported.")
+            continue
         file = node.get('file')
         uri = node.get('uri')
 
@@ -42,15 +47,11 @@ def importLocalRDF(context):
         if not uri:
             raise ValueError('Missing URI for graph: {}'.format(filename))
 
-        if node.tag == 'local':
-            logger.info('load {} into local store.'.format(file))
-            local.parse(data=data, publicID=uri, format='turtle')
-        elif node.tag == 'external':
-            logger.info('load {} into external store.'.format(file))
-            graph = Graph(identifier=uri)
-            graph.parse(data=data, format='turtle')
-            tool.getHandler().put(graph)
-    tool.clearCache()
+        # node.tag == 'external'
+        LOG.info('load {} into external store.'.format(file))
+        graph = Graph(identifier=uri)
+        graph.parse(data=data, format='turtle')
+        tool.getHandler().put(graph)
 
 
 def reindex_catalog_import(context, logger=None):
@@ -62,7 +63,7 @@ def reindex_catalog_import(context, logger=None):
     """
     if logger is None:
         # Called as upgrade step: define our own logger.
-        logger = logging.getLogger(__name__)
+        logger = LOG
 
     data = context.readDataFile('reindex_catalog.xml')
     if not data:

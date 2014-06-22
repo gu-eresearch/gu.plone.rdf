@@ -18,11 +18,6 @@
              tal:attributes="href string:$portal_url/@@plone_rdf_settings"
              i18n:translate="label_users">Settings</a>
         </li>
-        <li>
-          <a href=""
-             tal:attributes="href string:$portal_url/@@plone_rdf_managelocalgraphs"
-             i18n:translate="label_users">Internal Graphs</a>
-        </li>
         <li class="selected">
           <a href=""
              tal:attributes="href string:$portal_url/@@plone_rdf_managegraphs"

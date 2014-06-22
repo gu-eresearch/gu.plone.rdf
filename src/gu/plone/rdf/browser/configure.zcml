@@ -10,11 +10,6 @@
       class=".ordfsettings.RDFControlPanelForm"
       permission="cmf.ManagePortal" />
 
-  <browser:page
-      for="plone.app.layout.navigation.interfaces.INavigationRoot"
-      name="plone_rdf_managelocalgraphs"
-      class=".managegraphs.ManageLocalGraphsForm"
-      permission="cmf.ManagePortal" />
   <browser:resourceDirectory
         directory="static" name="gu.plone.rdf" />
 
