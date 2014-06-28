@@ -3,7 +3,7 @@
 
 from setuptools import setup, find_packages
 
-version = '2.5.1'
+version = '2.5.2-dev'
 
 setup(
     name='gu.plone.rdf',
