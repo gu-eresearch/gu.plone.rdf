@@ -30,3 +30,4 @@ def graph_for_content(content):
 def resource_for_content(content):
     graph = graph_for_content(content)
     return Resource(graph, graph.identifier)
+

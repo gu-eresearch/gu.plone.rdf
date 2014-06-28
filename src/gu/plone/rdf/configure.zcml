@@ -23,10 +23,20 @@
       for="plone.uuid.interfaces.IUUIDAware"
       provides="gu.z3cform.rdf.interfaces.IGraph"
       />
+  <adapter
+      factory=".adapter.graph_for_content"
+      for="Products.ZCatalog.interfaces.ICatalogBrain"
+      provides="gu.z3cform.rdf.interfaces.IGraph"
+      />
 
   <adapter
       factory=".adapter.resource_for_content"
       for="plone.uuid.interfaces.IUUIDAware"
+      provides="gu.z3cform.rdf.interfaces.IResource"
+      />
+  <adapter
+      factory=".adapter.resource_for_content"
+      for="Products.ZCatalog.interfaces.ICatalogBrain"
       provides="gu.z3cform.rdf.interfaces.IResource"
       />
 

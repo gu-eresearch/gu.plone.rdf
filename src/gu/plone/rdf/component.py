@@ -120,9 +120,12 @@ class ORDFUtility(object):
     def getContentUri(self, context):
         #1. determine subject uri for context
         # FIXME: use property, attribute, context absolute url
-
-        context = aq_base(context)
-        uuid = IUUID(context, None)
+        from Products.ZCatalog.interfaces import ICatalogBrain
+        if ICatalogBrain.providedBy(context):
+            uuid = context.UID
+        else:
+            context = aq_base(context)
+            uuid = IUUID(context, None)
         if uuid is None:
             # we probably deal with a new contet object that does not have an
             # uuid yet let's generate one
