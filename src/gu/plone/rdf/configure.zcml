@@ -76,7 +76,7 @@
     <configure zcml:condition="installed plone.formwidget.datetime">
 
       <class class="gu.z3cform.rdf.schema.RDFDateField">
-        <implements interface="plone.formwidget.datetime.interfaces.IDateField"/>
+        <implements interface="plone.formwidget.datetime.z3cform.interfaces.IDateField"/>
       </class>
 
       <adapter factory="converter.RDFDateDataConverter"
